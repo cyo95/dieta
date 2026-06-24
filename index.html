@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#0d0f0e">
 <meta name="apple-mobile-web-app-title" content="Dieta">
 <title>Dieta · CyoTools</title>
 <script>
@@ -651,6 +652,100 @@ input  { font-family: inherit; }
 .prep-note-txt { font-size: 13px; color: var(--cream); line-height: 1.5; }
 .prep-note-txt b { color: var(--gold); }
 
+
+/* ══════════════════════════════════════════════
+   MODE SELECTOR
+══════════════════════════════════════════════ */
+.mode-modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,.82);
+  display: flex; align-items: flex-end;
+  justify-content: center;
+}
+.mode-modal-overlay.hidden { display: none; }
+.mode-modal {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  border-top: 1px solid var(--line2);
+  padding: 28px 24px max(28px, env(safe-area-inset-bottom));
+  width: 100%; max-width: 520px;
+  animation: modeSlide .32s var(--spring) both;
+}
+@keyframes modeSlide {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.mode-modal-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px; color: var(--cream);
+  letter-spacing: -.3px; margin-bottom: 6px;
+}
+.mode-modal-sub {
+  font-size: 13px; color: var(--muted);
+  line-height: 1.5; margin-bottom: 22px;
+}
+.mode-options { display: flex; flex-direction: column; gap: 10px; }
+.mode-btn {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px; border-radius: var(--r);
+  background: var(--card); border: 1.5px solid var(--line2);
+  cursor: pointer; transition: .18s var(--ease);
+  text-align: left; width: 100%;
+}
+.mode-btn:active { transform: scale(.98); }
+.mode-btn.sel {
+  border-color: var(--copper);
+  background: var(--copper-bg);
+}
+.mode-btn-icon {
+  font-size: 26px; flex-shrink: 0;
+  width: 44px; height: 44px;
+  background: var(--card2); border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+}
+.mode-btn.sel .mode-btn-icon {
+  background: var(--copper-bg);
+}
+.mode-btn-body { flex: 1; }
+.mode-btn-name {
+  font-size: 15px; font-weight: 700; color: var(--cream);
+  margin-bottom: 2px;
+}
+.mode-btn-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+.mode-btn-check {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 1.5px solid var(--line2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: .15s var(--ease);
+}
+.mode-btn.sel .mode-btn-check {
+  background: var(--copper); border-color: var(--copper);
+}
+.mode-btn.sel .mode-btn-check::after {
+  content: '✓'; font-size: 11px; color: #fff; font-weight: 800;
+}
+.mode-confirm {
+  margin-top: 16px; width: 100%;
+  padding: 15px; border-radius: var(--r);
+  background: var(--copper); border: none;
+  color: #fff; font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: .15s var(--ease);
+  font-family: inherit;
+}
+.mode-confirm:active { transform: scale(.98); opacity: .9; }
+
+/* mode pill in header */
+.mode-pill {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+  background: var(--copper-bg);
+  border: 1px solid var(--copper-br);
+  color: var(--copper); cursor: pointer;
+  transition: .15s var(--ease); white-space: nowrap;
+}
+.mode-pill:active { opacity: .8; }
+
 /* ══════════════════════════════════════════════
    UTILS
 ══════════════════════════════════════════════ */
@@ -675,6 +770,7 @@ input  { font-family: inherit; }
     <div class="hdr-top">
       <a href="https://CyoTools.com/dieta" class="logo" style="text-decoration:none">CyoTools<span>.com/dieta</span></a>
       <div class="hdr-right">
+        <button class="mode-pill" id="modePill" onclick="openModeModal()"><span id="modePillIcon">👥</span><span id="modePillLabel">2 pers.</span></button>
         <div class="clock-pill" id="clock">00:00</div>
       </div>
     </div>
@@ -698,6 +794,17 @@ input  { font-family: inherit; }
   </div>
 
 </div><!-- /shell -->
+
+<!-- MODE SELECTOR MODAL -->
+<div class="mode-modal-overlay hidden" id="modeOverlay">
+  <div class="mode-modal">
+    <div class="mode-modal-title">¿Para cuántas personas?</div>
+    <div class="mode-modal-sub">Ajusta las cantidades de ingredientes y la lista de la compra a tu situación.</div>
+    <div class="mode-options" id="modeOptions"></div>
+    <button class="mode-confirm" onclick="confirmMode()">Confirmar</button>
+  </div>
+</div>
+
 
 <!-- SHEET OVERLAY -->
 <div class="overlay" id="overlay" onclick="closeSheet()"></div>
@@ -1215,6 +1322,161 @@ const PREP_DAYS = [
   },
 ];
 
+
+/* ════════════════════════════════════════════
+   MODE — personas
+   'two'   = 2 personas (base, sin cambio)
+   'one'   = 1 persona (todo ÷ 2)
+   'mixed' = comida 1 persona, cena 2 personas
+════════════════════════════════════════════ */
+const MODES = [
+  { id:'two',   icon:'👥', name:'2 personas',
+    desc:'Ingredientes y compra calculados para dos. La configuración original.' },
+  { id:'one',   icon:'🙋', name:'1 persona',
+    desc:'Todo a la mitad. Ingredientes y compra ajustados para ti solo.' },
+  { id:'mixed', icon:'🌙', name:'Cenas para 2, comidas para 1',
+    desc:'Comes solo durante el día y cenáis juntos. Las comidas se reducen a la mitad; las cenas quedan igual.' },
+];
+let currentMode = localStorage.getItem('mesa_mode') || 'two';
+let pendingMode = currentMode;
+
+function openModeModal() {
+  pendingMode = currentMode;
+  renderModeOptions();
+  document.getElementById('modeOverlay').classList.remove('hidden');
+}
+
+function renderModeOptions() {
+  const container = document.getElementById('modeOptions');
+  container.innerHTML = MODES.map(m => `
+    <button class="mode-btn ${pendingMode === m.id ? 'sel' : ''}" onclick="selectMode('${m.id}')">
+      <div class="mode-btn-icon">${m.icon}</div>
+      <div class="mode-btn-body">
+        <div class="mode-btn-name">${m.name}</div>
+        <div class="mode-btn-desc">${m.desc}</div>
+      </div>
+      <div class="mode-btn-check"></div>
+    </button>`).join('');
+}
+
+function selectMode(id) {
+  pendingMode = id;
+  renderModeOptions();
+}
+
+function confirmMode() {
+  currentMode = pendingMode;
+  localStorage.setItem('mesa_mode', currentMode);
+  document.getElementById('modeOverlay').classList.add('hidden');
+  updateModePill();
+  // refresh all rendered views
+  renderHoy();
+  const activeName = document.querySelector('.view.on')?.id?.replace('v','');
+  if (activeName === 'semana') renderSemana();
+  if (activeName === 'compra') renderCompra();
+  if (activeName === 'prep')   renderPrep();
+}
+
+function updateModePill() {
+  const m = MODES.find(x => x.id === currentMode);
+  document.getElementById('modePillIcon').textContent  = m.icon;
+  document.getElementById('modePillLabel').textContent =
+    currentMode === 'two' ? '2 pers.' : currentMode === 'one' ? '1 pers.' : '1+2';
+}
+
+/* ── quantity scaling ──────────────────────
+   Parses a quantity string like "400 g", "2 ud", "½ ud", "1½ cdta"
+   and scales it by factor, returning a clean string.
+   Non-scalable strings (e.g. "al gusto") are returned as-is.
+─────────────────────────────────────────── */
+function scaleQty(qStr, factor) {
+  if (factor === 1) return qStr;
+  if (!qStr || qStr === 'al gusto' || qStr === 'generosa') return qStr;
+
+  // Extract leading number (handles integers, decimals, fractions ½ ¼ ¾ 1½)
+  const FRACS = { '½': 0.5, '¼': 0.25, '¾': 0.75 };
+
+  let numPart = 0;
+  let rest = qStr.trim();
+
+  // mixed like "1½"
+  const mixed = rest.match(/^(\d+)(½|¼|¾)/);
+  if (mixed) {
+    numPart = parseInt(mixed[1]) + FRACS[mixed[2]];
+    rest = rest.slice(mixed[0].length).trim();
+  } else {
+    // pure fraction
+    const frac = rest.match(/^(½|¼|¾)/);
+    if (frac) {
+      numPart = FRACS[frac[1]];
+      rest = rest.slice(frac[0].length).trim();
+    } else {
+      // decimal or integer
+      const num = rest.match(/^(\d+\.?\d*)/);
+      if (!num) return qStr; // can't parse, return as-is
+      numPart = parseFloat(num[1]);
+      rest = rest.slice(num[0].length).trim();
+    }
+  }
+
+  let scaled = numPart * factor;
+
+  // Format nicely
+  let formatted;
+  if (Math.abs(scaled - Math.round(scaled)) < 0.01) {
+    formatted = String(Math.round(scaled));
+  } else if (Math.abs(scaled - 0.5) < 0.01) {
+    formatted = '½';
+  } else if (Math.abs(scaled - 0.25) < 0.01) {
+    formatted = '¼';
+  } else if (Math.abs(scaled - 0.75) < 0.01) {
+    formatted = '¾';
+  } else if (Math.abs(scaled - 1.5) < 0.01) {
+    formatted = '1½';
+  } else {
+    // round to 1 decimal
+    formatted = (Math.round(scaled * 10) / 10).toString();
+  }
+
+  return formatted + (rest ? ' ' + rest : '');
+}
+
+/* returns {comidaFactor, cenaFactor} for current mode */
+function getFactors() {
+  if (currentMode === 'two')   return { c: 1,   ce: 1   };
+  if (currentMode === 'one')   return { c: 0.5, ce: 0.5 };
+  if (currentMode === 'mixed') return { c: 0.5, ce: 1   };
+  return { c: 1, ce: 1 };
+}
+
+/* label text for "N personas" in sheet */
+function persLabel(mealType) {
+  const f = getFactors();
+  const factor = mealType === 'cena' ? f.ce : f.c;
+  return factor === 1 ? '2 personas' : '1 persona';
+}
+
+/* scale a recipe's prot/kcal for display */
+function scaleStat(val, mealType) {
+  const f = getFactors();
+  const factor = mealType === 'cena' ? f.ce : f.c;
+  return Math.round(val * factor);
+}
+
+/* scale shopping quantities */
+function scaleShopQty(item) {
+  // Shopping is always total for the week.
+  // mode 'two'   => base qty
+  // mode 'one'   => base / 2
+  // mode 'mixed' => comida ingredients halved, cena full
+  //   But shop items aren't labelled by meal — use 0.75 as a fair average
+  //   (roughly half the week's meals are comidas, half cenas)
+  if (currentMode === 'two')   return item.q;
+  if (currentMode === 'one')   return scaleQty(item.q, 0.5);
+  if (currentMode === 'mixed') return scaleQty(item.q, 0.75); // weighted average
+  return item.q;
+}
+
 /* ════════════════════════════════════════════
    STATE
 ════════════════════════════════════════════ */
@@ -1272,12 +1534,17 @@ function recipeSheetHTML(recipe, mealType) {
   const labelClass = mealType === 'comida' ? 'ml-comida' : mealType === 'cena' ? 'ml-cena' : 'ml-desay';
   const labelText = mealType === 'comida' ? '☀️ Comida' : mealType === 'cena' ? '🌙 Cena' : '☕ Desayuno';
 
-  const ingredientsHTML = recipe.ingredients
-    .map(i => `<div class="ingredient">
+  const f = getFactors();
+  const factor = mealType === 'cena' ? f.ce : f.c;
+  const ingredientsHTML = (recipe.ingredients || [])
+    .map(i => {
+      const scaledQ = scaleQty(i.q, factor);
+      return `<div class="ingredient">
       <div class="ing-dot"></div>
       <span class="ing-name">${i.n}</span>
-      <span class="ing-qty">${i.q}</span>
-    </div>`).join('');
+      <span class="ing-qty">${scaledQ}</span>
+    </div>`;
+    }).join('');
 
   const stepsHTML = recipe.steps.map((s, idx) => `
     <div class="step-row">
@@ -1291,9 +1558,11 @@ function recipeSheetHTML(recipe, mealType) {
       </div>
     </div>`).join('');
 
+  const scaledProt = recipe.prot ? scaleStat(recipe.prot, mealType) : null;
+  const scaledKcal = recipe.kcal ? scaleStat(recipe.kcal, mealType) : null;
   const chipsHTML = (recipe.chips || [
-    {t: `${recipe.prot}g proteína`, cls:'prot'},
-    {t: `${recipe.kcal} kcal`, cls:'kcal'},
+    ...(scaledProt ? [{t: `${scaledProt}g proteína`, cls:'prot'}] : []),
+    ...(scaledKcal ? [{t: `${scaledKcal} kcal`, cls:'kcal'}] : []),
     {t: `${recipe.mins} min`, cls:'time'},
     {t: 'Fácil', cls:'easy'},
   ]).map(c => `<span class="sh-chip ${c.cls}">${c.t}</span>`).join('');
@@ -1311,7 +1580,7 @@ function recipeSheetHTML(recipe, mealType) {
     <div class="sheet-tagline">${recipe.tagline}</div>
     <div class="sheet-chips">${chipsHTML}</div>
     <div class="sh-divider"></div>
-    <div class="sh-section-title">Ingredientes · 2 personas</div>
+    <div class="sh-section-title">Ingredientes · ${persLabel(mealType)}</div>
     <div class="ingredient-list">${ingredientsHTML}</div>
     ${prepNoteHTML}
     <div class="sh-divider"></div>
@@ -1386,8 +1655,9 @@ function renderHoy() {
   }
 
   /* macros */
-  const totalKcal = (menu?.comida?.kcal||0) + (menu?.cena?.kcal||0) + 400;
-  const totalProt = (menu?.comida?.prot||0) + (menu?.cena?.prot||0) + 22;
+  const f = getFactors();
+  const totalKcal = Math.round((menu?.comida?.kcal||0)*f.c + (menu?.cena?.kcal||0)*f.ce) + 400;
+  const totalProt = Math.round((menu?.comida?.prot||0)*f.c + (menu?.cena?.prot||0)*f.ce) + 22;
   const macrosHTML = `<div class="macro-row">
     <div class="macro-box"><div class="macro-val kc">${totalKcal}</div><div class="macro-lbl">Kcal</div></div>
     <div class="macro-box"><div class="macro-val pr">${totalProt}g</div><div class="macro-lbl">Prot.</div></div>
@@ -1413,8 +1683,8 @@ function renderHoy() {
           <div class="meal-tagline">${r.tagline}</div>
           <div class="meal-footer">
             <div class="meal-chips">
-              <span class="chip prot">${r.prot}g prot.</span>
-              <span class="chip kcal">${r.kcal} kcal</span>
+              <span class="chip prot">${scaleStat(r.prot,tipo)}g prot.</span>
+              <span class="chip kcal">${scaleStat(r.kcal,tipo)} kcal</span>
               <span class="chip">${r.mins} min</span>
             </div>
             <div class="meal-arrow">›</div>
@@ -1505,7 +1775,7 @@ function renderSemana() {
           <div class="wm-info">
             <div class="wm-type c">☀️ Comida</div>
             <div class="wm-name">${m.comida.name}</div>
-            <div class="wm-meta">${m.comida.mins} min · ${m.comida.prot}g prot. · ${m.comida.kcal} kcal</div>
+            <div class="wm-meta">${m.comida.mins} min · ${scaleStat(m.comida.prot,'comida')}g prot. · ${scaleStat(m.comida.kcal,'comida')} kcal</div>
           </div>
           <div class="wm-arrow">›</div>
         </div>
@@ -1514,7 +1784,7 @@ function renderSemana() {
           <div class="wm-info">
             <div class="wm-type ce">🌙 Cena</div>
             <div class="wm-name">${m.cena.name}</div>
-            <div class="wm-meta">${m.cena.mins} min · ${m.cena.prot}g prot. · ${m.cena.kcal} kcal</div>
+            <div class="wm-meta">${m.cena.mins} min · ${scaleStat(m.cena.prot,'cena')}g prot. · ${scaleStat(m.cena.kcal,'cena')} kcal</div>
           </div>
           <div class="wm-arrow">›</div>
         </div>
@@ -1538,10 +1808,11 @@ function renderCompra() {
   const ckCount  = allItems.filter((_,i) => shopCk[i]).length;
   const pct = Math.round(ckCount / allItems.length * 100);
 
+  const modeLabel = currentMode==='two' ? 'Para 2 personas' : currentMode==='one' ? 'Para 1 persona' : 'Comidas para 1, cenas para 2';
   let html = `
     <div class="shop-top">
       <div class="shop-top-title">🏪 Mercadona · Semana completa</div>
-      <div class="shop-top-sub">Para 2 personas. Con margen por si os saltáis alguna comida.</div>
+      <div class="shop-top-sub">${modeLabel} · Con margen si os saltáis alguna comida.</div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%"></div></div>
       <div class="prog-label">${ckCount} de ${allItems.length} productos · ${pct}%</div>
     </div>
@@ -1565,7 +1836,7 @@ function renderCompra() {
       html += `<div class="shop-item ${shopCk[idx] ? 'ck' : ''}" onclick="ckShop(${idx})">
         <div class="s-check"><span class="s-check-mark">✓</span></div>
         <span class="s-name">${item.n}${usoBadge}</span>
-        <span class="s-qty">${item.q}</span>
+        <span class="s-qty">${scaleShopQty(item)}</span>
       </div>`;
       gi++;
     });
@@ -1678,6 +1949,13 @@ sheet.addEventListener('touchend',   e => {
    INIT
 ════════════════════════════════════════════ */
 buildStrip();
+updateModePill();
+// First visit: show mode selector
+if (!localStorage.getItem('mesa_mode')) {
+  pendingMode = 'two';
+  renderModeOptions();
+  document.getElementById('modeOverlay').classList.remove('hidden');
+}
 renderHoy();
 
 setInterval(() => {
