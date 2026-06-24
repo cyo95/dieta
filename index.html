@@ -5,10 +5,72 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CyoTools Dieta">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230d0f0e'/%3E%3Crect width='512' height='512' rx='112' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23161a15'/%3E%3Cstop offset='1' stop-color='%230d0f0e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='256' cy='210' r='88' fill='none' stroke='%23e8845a' stroke-width='22'/%3E%3Cline x1='256' y1='122' x2='256' y2='78' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Cline x1='256' y1='298' x2='256' y2='348' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Cline x1='256' y1='348' x2='210' y2='420' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Cline x1='256' y1='348' x2='302' y2='420' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='210' r='30' fill='%23e8845a'/%3E%3Ctext x='256' y='480' text-anchor='middle' font-family='system-ui,sans-serif' font-size='52' font-weight='800' fill='%23f0ead8' opacity='0.5'%3ECyoTools%3C/text%3E%3C/svg%3E">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d0f0e'/%3E%3Ccircle cx='16' cy='13' r='6' fill='none' stroke='%23e8845a' stroke-width='1.6'/%3E%3Cline x1='16' y1='7' x2='16' y2='4' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cline x1='16' y1='19' x2='16' y2='22' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cline x1='16' y1='22' x2='13' y2='27' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cline x1='16' y1='22' x2='19' y2='27' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='13' r='2.2' fill='%23e8845a'/%3E%3C/svg%3E">
-<title>CyoTools · Dieta semanal</title>
+<meta name="apple-mobile-web-app-title" content="Dieta">
+<title>Dieta · CyoTools</title>
+<script>
+(function(){
+  var c = document.createElement('canvas');
+  c.width = 512; c.height = 512;
+  var ctx = c.getContext('2d');
+  // rounded rect background
+  var r = 100;
+  ctx.beginPath();
+  ctx.moveTo(r,0); ctx.lineTo(512-r,0);
+  ctx.quadraticCurveTo(512,0,512,r);
+  ctx.lineTo(512,512-r);
+  ctx.quadraticCurveTo(512,512,512-r,512);
+  ctx.lineTo(r,512);
+  ctx.quadraticCurveTo(0,512,0,512-r);
+  ctx.lineTo(0,r);
+  ctx.quadraticCurveTo(0,0,r,0);
+  ctx.closePath();
+  var grad = ctx.createLinearGradient(0,0,512,512);
+  grad.addColorStop(0,'#1c2119');
+  grad.addColorStop(1,'#0d0f0e');
+  ctx.fillStyle = grad;
+  ctx.fill();
+  var cu = '#e8845a';
+  ctx.strokeStyle = cu;
+  ctx.fillStyle   = cu;
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 20;
+  // fork — left side
+  // 3 tines
+  [170,210,250].forEach(function(x){
+    ctx.beginPath(); ctx.moveTo(x,108); ctx.lineTo(x,210); ctx.stroke();
+  });
+  // arch under tines
+  ctx.beginPath();
+  ctx.moveTo(170,210);
+  ctx.quadraticCurveTo(170,240,210,250);
+  ctx.quadraticCurveTo(250,240,250,210);
+  ctx.stroke();
+  // fork handle
+  ctx.beginPath(); ctx.moveTo(210,250); ctx.lineTo(210,400); ctx.stroke();
+  // knife — right side
+  ctx.beginPath(); ctx.moveTo(300,108); ctx.lineTo(300,230); ctx.stroke();
+  // blade bevel
+  ctx.beginPath();
+  ctx.moveTo(300,108);
+  ctx.bezierCurveTo(340,108,350,180,300,230);
+  ctx.fillStyle = cu;
+  ctx.fill();
+  // knife handle
+  ctx.strokeStyle = cu;
+  ctx.beginPath(); ctx.moveTo(300,230); ctx.lineTo(300,400); ctx.stroke();
+  // glowing dot
+  ctx.beginPath(); ctx.arc(256,446,10,0,Math.PI*2);
+  ctx.fillStyle = cu; ctx.globalAlpha=0.4; ctx.fill(); ctx.globalAlpha=1;
+  // inject PNG link (iOS requires PNG, not SVG data URI)
+  var png = c.toDataURL('image/png');
+  var link = document.createElement('link');
+  link.rel = 'apple-touch-icon'; link.href = png;
+  document.head.appendChild(link);
+  var fav = document.createElement('link');
+  fav.rel = 'icon'; fav.type = 'image/png'; fav.href = png;
+  document.head.appendChild(fav);
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
