@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Mesa · Tu semana</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS
+══════════════════════════════════════════════ */
+:root {
+  --ink:       #0d0f0e;
+  --surface:   #141714;
+  --card:      #1b1f1b;
+  --card2:     #222622;
+  --line:      #2a302a;
+  --line2:     #333b33;
+  --copper:    #e8845a;
+  --copper-d:  #b85e38;
+  --copper-bg: rgba(232,132,90,.1);
+  --copper-br: rgba(232,132,90,.2);
+  --sage:      #7ab88a;
+  --sage-bg:   rgba(122,184,138,.1);
+  --sage-br:   rgba(122,184,138,.22);
+  --cream:     #f0ead8;
+  --cream2:    #c8c0ae;
+  --muted:     #7a8479;
+  --gold:      #d4a843;
+  --gold-bg:   rgba(212,168,67,.1);
+  --r:         16px;
+  --rs:        10px;
+  --rx:        22px;
+  --ease:      cubic-bezier(.32,0,.18,1);
+  --spring:    cubic-bezier(.34,1.56,.64,1);
+}
+
+/* ══════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; -webkit-text-size-adjust: 100%; }
+body {
+  height: 100%; overflow: hidden;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 15px; line-height: 1.5;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+input  { font-family: inherit; }
+
+/* ══════════════════════════════════════════════
+   LAYOUT SHELL
+══════════════════════════════════════════════ */
+.shell {
+  display: flex; flex-direction: column;
+  height: 100dvh; height: 100vh;
+  overflow: hidden;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+.hdr {
+  flex-shrink: 0;
+  padding: 14px 20px 0;
+  background: var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+.hdr-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; color: var(--cream);
+  letter-spacing: -.3px;
+}
+.logo span { color: var(--copper); }
+.hdr-right { display: flex; align-items: center; gap: 10px; }
+.clock-pill {
+  font-size: 12px; font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--copper);
+  background: var(--copper-bg);
+  border: 1px solid var(--copper-br);
+  padding: 4px 11px; border-radius: 20px;
+  letter-spacing: .3px;
+}
+
+/* day strip */
+.day-strip {
+  display: flex; gap: 4px;
+  overflow-x: auto; scrollbar-width: none;
+  padding-bottom: 14px;
+}
+.day-strip::-webkit-scrollbar { display: none; }
+.dp {
+  flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 3px; padding: 7px 10px; border-radius: var(--rs);
+  border: 1.5px solid transparent;
+  background: transparent; color: var(--muted);
+  font-size: 11px; font-weight: 700; letter-spacing: .4px;
+  text-transform: uppercase; transition: .18s var(--ease);
+  min-width: 44px;
+}
+.dp .dnum {
+  font-size: 15px; font-weight: 800; color: var(--muted);
+  line-height: 1; font-variant-numeric: tabular-nums;
+}
+.dp.today { color: var(--copper); }
+.dp.today .dnum { color: var(--copper); }
+.dp.sel {
+  background: var(--copper-bg);
+  border-color: var(--copper-br);
+  color: var(--copper);
+}
+.dp.sel .dnum { color: var(--cream); }
+
+/* ── TABS ────────────────────────────────────── */
+.tabs {
+  flex-shrink: 0;
+  display: flex; gap: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.tab {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  padding: 10px 4px 8px;
+  color: var(--muted); font-size: 10px; font-weight: 700;
+  letter-spacing: .4px; text-transform: uppercase;
+  border-bottom: 2px solid transparent;
+  transition: .15s var(--ease);
+}
+.tab .ticon { font-size: 18px; line-height: 1; }
+.tab.on { color: var(--copper); border-bottom-color: var(--copper); }
+
+/* ── CONTENT SCROLL ──────────────────────────── */
+.content {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* ══════════════════════════════════════════════
+   VIEWS
+══════════════════════════════════════════════ */
+.view { display: none; padding: 20px 20px 32px; }
+.view.on { display: block; animation: fadeSlide .22s var(--ease) both; }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════════════════
+   HOY VIEW — components
+══════════════════════════════════════════════ */
+
+/* now banner */
+.now-card {
+  background: var(--card);
+  border: 1px solid var(--line2);
+  border-radius: var(--r);
+  padding: 18px;
+  margin-bottom: 20px;
+  position: relative; overflow: hidden;
+}
+.now-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--copper), transparent 70%);
+}
+.now-eyebrow {
+  font-size: 10px; font-weight: 800; letter-spacing: 1.4px;
+  text-transform: uppercase; color: var(--copper);
+  margin-bottom: 7px;
+}
+.now-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 24px; line-height: 1.15; letter-spacing: -.3px;
+  color: var(--cream); margin-bottom: 4px;
+}
+.now-sub { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.now-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.ntag {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+}
+.ntag-copper { background: var(--copper-bg); color: var(--copper); border: 1px solid var(--copper-br); }
+.ntag-sage   { background: var(--sage-bg);   color: var(--sage);   border: 1px solid var(--sage-br); }
+.ntag-gold   { background: var(--gold-bg);   color: var(--gold);   border: 1px solid rgba(212,168,67,.2); }
+
+/* section heading */
+.sec-head {
+  font-size: 11px; font-weight: 800; letter-spacing: 1.3px;
+  text-transform: uppercase; color: var(--muted);
+  margin: 24px 0 12px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-head::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+/* meal cards — big tappable cards */
+.meal-card {
+  background: var(--card);
+  border: 1px solid var(--line2);
+  border-radius: var(--r);
+  padding: 0; margin-bottom: 10px;
+  overflow: hidden; cursor: pointer;
+  transition: .18s var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.meal-card:active { transform: scale(.985); opacity: .9; }
+.meal-card-inner { padding: 16px 18px; }
+.meal-card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px;
+  margin-bottom: 10px;
+}
+.meal-label {
+  font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; padding: 3px 8px;
+  border-radius: 8px; display: inline-block;
+}
+.ml-comida { background: rgba(122,184,138,.12); color: var(--sage); }
+.ml-cena   { background: rgba(232,132,90,.1);   color: var(--copper); }
+.ml-desay  { background: rgba(212,168,67,.1);   color: var(--gold); }
+.meal-time {
+  font-size: 11px; font-weight: 700; color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.meal-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; line-height: 1.2; letter-spacing: -.2px;
+  color: var(--cream); margin-bottom: 6px;
+}
+.meal-tagline { font-size: 13px; color: var(--muted); line-height: 1.45; margin-bottom: 12px; }
+.meal-footer {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  align-items: center; justify-content: space-between;
+}
+.meal-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+  background: var(--card2); color: var(--muted);
+  border: 1px solid var(--line);
+}
+.chip.prot { color: var(--sage); background: var(--sage-bg); border-color: var(--sage-br); }
+.chip.kcal { color: var(--gold); background: var(--gold-bg); border-color: rgba(212,168,67,.2); }
+.meal-arrow {
+  font-size: 16px; color: var(--muted); flex-shrink: 0;
+}
+.meal-divider { height: 1px; background: var(--line); }
+.meal-prep-strip {
+  padding: 10px 18px;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--muted);
+}
+.meal-prep-strip .prep-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); flex-shrink: 0;
+}
+
+/* desayuno card grid */
+.bf-grid { display: flex; flex-direction: column; gap: 8px; }
+.bf-card {
+  background: var(--card);
+  border: 1px solid var(--line2);
+  border-radius: var(--rs);
+  padding: 13px 15px;
+  display: flex; gap: 12px; align-items: flex-start;
+  cursor: pointer; transition: .15s var(--ease);
+}
+.bf-card:active { transform: scale(.985); }
+.bf-letter {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  background: var(--gold-bg); color: var(--gold);
+  font-family: 'DM Serif Display', serif;
+  font-size: 17px; display: flex; align-items: center; justify-content: center;
+}
+.bf-name { font-size: 14px; font-weight: 700; color: var(--cream); margin-bottom: 3px; }
+.bf-items { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* macros bar */
+.macro-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-bottom: 20px;
+}
+.macro-box {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--rs); padding: 12px 8px; text-align: center;
+}
+.macro-val {
+  font-size: 18px; font-weight: 800; line-height: 1;
+  font-variant-numeric: tabular-nums; margin-bottom: 3px;
+}
+.macro-val.kc { color: var(--gold); }
+.macro-val.pr { color: var(--sage); }
+.macro-val.ti { color: var(--copper); }
+.macro-val.di { color: var(--cream2); }
+.macro-lbl {
+  font-size: 9px; font-weight: 700; letter-spacing: .6px;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* ══════════════════════════════════════════════
+   SEMANA VIEW
+══════════════════════════════════════════════ */
+.week-day {
+  background: var(--card); border: 1px solid var(--line2);
+  border-radius: var(--r); margin-bottom: 8px; overflow: hidden;
+}
+.week-day-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px; cursor: pointer; transition: .15s;
+}
+.week-day-hdr:active { background: var(--card2); }
+.week-day-name {
+  font-size: 14px; font-weight: 700; color: var(--cream);
+  display: flex; align-items: center; gap: 8px;
+}
+.today-badge {
+  font-size: 9px; font-weight: 800; letter-spacing: .6px;
+  text-transform: uppercase;
+  background: var(--copper); color: #fff;
+  padding: 2px 7px; border-radius: 8px;
+}
+.week-day-arrow {
+  font-size: 14px; color: var(--muted);
+  transition: transform .2s var(--ease);
+}
+.week-day.open .week-day-arrow { transform: rotate(90deg); }
+.week-day-body { display: none; }
+.week-day.open .week-day-body { display: block; }
+.week-meal-row {
+  display: flex; gap: 10px; align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid var(--line);
+  cursor: pointer; transition: .15s;
+}
+.week-meal-row:active { background: var(--card2); }
+.wm-icon { font-size: 20px; flex-shrink: 0; }
+.wm-info { flex: 1; }
+.wm-type {
+  font-size: 9px; font-weight: 800; letter-spacing: .8px;
+  text-transform: uppercase; margin-bottom: 2px;
+}
+.wm-type.c { color: var(--sage); }
+.wm-type.ce { color: var(--copper); }
+.wm-name { font-size: 13px; font-weight: 600; color: var(--cream); line-height: 1.3; }
+.wm-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.wm-arrow { font-size: 14px; color: var(--line2); }
+
+/* ══════════════════════════════════════════════
+   COMPRA VIEW
+══════════════════════════════════════════════ */
+.shop-top {
+  background: var(--card); border: 1px solid var(--line2);
+  border-radius: var(--r); padding: 16px; margin-bottom: 14px;
+}
+.shop-top-title { font-size: 16px; font-weight: 700; color: var(--cream); margin-bottom: 4px; }
+.shop-top-sub { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+.prog-wrap { background: var(--line); border-radius: 3px; height: 4px; }
+.prog-fill {
+  height: 100%; border-radius: 3px;
+  background: var(--sage);
+  transition: width .4s var(--ease);
+}
+.prog-label {
+  font-size: 11px; font-weight: 700; color: var(--sage);
+  margin-top: 6px; text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.shop-section { margin-bottom: 6px; }
+.shop-cat-lbl {
+  font-size: 10px; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 14px 0 8px;
+}
+.shop-list {
+  background: var(--card); border: 1px solid var(--line2);
+  border-radius: var(--r); overflow: hidden;
+}
+.shop-item {
+  display: flex; align-items: center; gap: 13px;
+  padding: 11px 15px; cursor: pointer;
+  border-bottom: 1px solid var(--line);
+  transition: .13s;
+}
+.shop-item:last-child { border-bottom: none; }
+.shop-item:active { background: var(--card2); }
+.s-check {
+  width: 21px; height: 21px; border-radius: 50%;
+  border: 1.5px solid var(--line2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: .15s var(--ease);
+}
+.shop-item.ck .s-check {
+  background: var(--sage); border-color: var(--sage);
+}
+.s-check-mark { display: none; }
+.shop-item.ck .s-check-mark {
+  display: block; font-size: 11px; color: #0d0f0e; font-weight: 800;
+}
+.s-name {
+  flex: 1; font-size: 13px; color: var(--cream);
+  transition: .13s; line-height: 1.3;
+}
+.shop-item.ck .s-name { color: var(--muted); text-decoration: line-through; }
+.s-qty { font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.reset-btn {
+  width: 100%; padding: 13px; border-radius: var(--r);
+  border: 1px solid var(--line2); background: transparent;
+  color: var(--muted); font-size: 13px; font-weight: 600;
+  margin-top: 10px; transition: .15s;
+}
+.reset-btn:active { background: var(--card2); }
+
+/* ══════════════════════════════════════════════
+   PREP VIEW
+══════════════════════════════════════════════ */
+.prep-day {
+  background: var(--card); border: 1px solid var(--line2);
+  border-radius: var(--r); margin-bottom: 10px; overflow: hidden;
+}
+.prep-day-hdr {
+  padding: 14px 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--line); cursor: pointer;
+  transition: .13s;
+}
+.prep-day-hdr:active { background: var(--card2); }
+.prep-day-title { font-size: 14px; font-weight: 700; color: var(--cream); }
+.prep-day-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.prep-day-pct {
+  font-size: 13px; font-weight: 800;
+  color: var(--sage); flex-shrink: 0;
+}
+.prep-items { }
+.prep-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 12px 16px; border-bottom: 1px solid var(--line);
+  cursor: pointer; transition: .13s;
+}
+.prep-item:last-child { border-bottom: none; }
+.prep-item:active { background: var(--card2); }
+.prep-ico { font-size: 18px; flex-shrink: 0; padding-top: 1px; }
+.prep-txt { flex: 1; font-size: 13px; color: var(--cream); line-height: 1.5; transition: .13s; }
+.prep-item.ck .prep-txt { color: var(--muted); text-decoration: line-through; }
+.prep-chk {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid var(--line2); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: .15s var(--ease); margin-top: 1px;
+}
+.prep-item.ck .prep-chk { background: var(--sage); border-color: var(--sage); }
+.prep-chk-mark { display: none; font-size: 10px; color: #0d0f0e; font-weight: 800; }
+.prep-item.ck .prep-chk-mark { display: block; }
+
+/* ══════════════════════════════════════════════
+   BOTTOM SHEET (MODAL)
+══════════════════════════════════════════════ */
+.overlay {
+  position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  transition: background .3s var(--ease);
+}
+.overlay.show {
+  background: rgba(0,0,0,.65);
+  pointer-events: all;
+}
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 400;
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  border-top: 1px solid var(--line2);
+  max-height: 92dvh; max-height: 92vh;
+  display: flex; flex-direction: column;
+  transform: translateY(100%);
+  transition: transform .38s var(--spring);
+  overflow: hidden;
+}
+.sheet.open { transform: translateY(0); }
+
+.sheet-handle-wrap {
+  flex-shrink: 0; padding: 12px 0 4px;
+  display: flex; justify-content: center; cursor: pointer;
+}
+.sheet-handle {
+  width: 36px; height: 4px; border-radius: 2px;
+  background: var(--line2);
+}
+.sheet-scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 22px 48px;
+}
+.sheet-eyebrow {
+  font-size: 10px; font-weight: 800; letter-spacing: 1.3px;
+  text-transform: uppercase; color: var(--copper);
+  margin-bottom: 8px;
+}
+.sheet-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 26px; line-height: 1.15; color: var(--cream);
+  margin-bottom: 6px; letter-spacing: -.3px;
+}
+.sheet-tagline {
+  font-size: 14px; color: var(--muted); line-height: 1.5;
+  margin-bottom: 18px;
+}
+.sheet-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.sh-chip {
+  font-size: 12px; font-weight: 700;
+  padding: 5px 12px; border-radius: 20px;
+}
+.sh-chip.prot { background: var(--sage-bg); color: var(--sage); border: 1px solid var(--sage-br); }
+.sh-chip.kcal { background: var(--gold-bg); color: var(--gold); border: 1px solid rgba(212,168,67,.2); }
+.sh-chip.time { background: var(--copper-bg); color: var(--copper); border: 1px solid var(--copper-br); }
+.sh-chip.easy { background: rgba(200,192,174,.06); color: var(--cream2); border: 1px solid var(--line2); }
+
+/* divider within sheet */
+.sh-divider {
+  height: 1px; background: var(--line);
+  margin: 20px 0;
+}
+
+/* ingredients */
+.sh-section-title {
+  font-size: 11px; font-weight: 800; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--muted);
+  margin-bottom: 12px;
+}
+.ingredient-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+.ingredient {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 12px; border-radius: var(--rs);
+  background: var(--card); border: 1px solid var(--line);
+}
+.ing-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--copper); flex-shrink: 0;
+}
+.ing-name { flex: 1; font-size: 13px; color: var(--cream); }
+.ing-qty { font-size: 12px; font-weight: 700; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* steps */
+.steps-list { display: flex; flex-direction: column; gap: 10px; }
+.step-row { display: flex; gap: 14px; align-items: flex-start; }
+.step-num-wrap {
+  display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+}
+.step-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--copper-bg); border: 1px solid var(--copper-br);
+  color: var(--copper); font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.step-connector {
+  width: 1px; flex: 1; min-height: 14px;
+  background: var(--line); margin-top: 4px;
+}
+.step-body { flex: 1; padding-bottom: 6px; }
+.step-title { font-size: 13px; font-weight: 700; color: var(--cream); margin-bottom: 2px; }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+/* prep note inside sheet */
+.prep-note {
+  background: var(--gold-bg);
+  border: 1px solid rgba(212,168,67,.2);
+  border-radius: var(--rs); padding: 13px 14px;
+  display: flex; gap: 10px; align-items: flex-start;
+  margin-top: 4px;
+}
+.prep-note-ico { font-size: 16px; flex-shrink: 0; }
+.prep-note-txt { font-size: 13px; color: var(--cream); line-height: 1.5; }
+.prep-note-txt b { color: var(--gold); }
+
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+.info-banner {
+  background: var(--card); border: 1px solid var(--line2);
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; gap: 11px; align-items: flex-start;
+  margin-bottom: 14px;
+}
+.ib-icon { font-size: 18px; flex-shrink: 0; }
+.ib-body { flex: 1; }
+.ib-title { font-size: 13px; font-weight: 700; color: var(--cream); margin-bottom: 2px; }
+.ib-text { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.ib-text b { color: var(--copper); }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-top">
+      <div class="logo">me<span>·</span>sa</div>
+      <div class="hdr-right">
+        <div class="clock-pill" id="clock">00:00</div>
+      </div>
+    </div>
+    <div class="day-strip" id="dayStrip"></div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab on"  onclick="goTab('hoy',this)"><span class="ticon">⚡</span>Hoy</button>
+    <button class="tab"     onclick="goTab('semana',this)"><span class="ticon">📅</span>Semana</button>
+    <button class="tab"     onclick="goTab('compra',this)"><span class="ticon">🛒</span>Compra</button>
+    <button class="tab"     onclick="goTab('prep',this)"><span class="ticon">🔪</span>Prep</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <div class="view on" id="vhoy"></div>
+    <div class="view"    id="vsemana"></div>
+    <div class="view"    id="vcompra"></div>
+    <div class="view"    id="vprep"></div>
+  </div>
+
+</div><!-- /shell -->
+
+<!-- SHEET OVERLAY -->
+<div class="overlay" id="overlay" onclick="closeSheet()"></div>
+
+<!-- BOTTOM SHEET -->
+<div class="sheet" id="sheet">
+  <div class="sheet-handle-wrap" onclick="closeSheet()">
+    <div class="sheet-handle"></div>
+  </div>
+  <div class="sheet-scroll" id="sheetScroll"></div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════ */
+const DAYS_L  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const DAYS_S  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+
+/* ─── BREAKFASTS ─────────────────────────── */
+const BFASTS = [
+  {
+    id:'A', label:'Yogur, granola y fruta',
+    tagline:'Rápido y saciante. Montas el bol en 2 minutos.',
+    ingredients:[
+      {n:'Yogur griego proteico', q:'200 g'},
+      {n:'Granola sin azúcar', q:'40 g'},
+      {n:'Frutos rojos o plátano', q:'1 puñado'},
+      {n:'Miel (opcional)', q:'1 cdta'},
+    ],
+    steps:[
+      {t:'Base',d:'Vierte el yogur en un bol amplio.'},
+      {t:'Encima',d:'Reparte la granola para que quede crujiente.'},
+      {t:'Fruta',d:'Añade los frutos rojos o el plátano en rodajas. Un hilo de miel si quieres dulzor extra.'},
+    ],
+    chips:[{t:'~25 g prot',cls:'prot'},{t:'~380 kcal',cls:'kcal'},{t:'2 min',cls:'time'}],
+    prepNote: null,
+  },
+  {
+    id:'B', label:'Pan integral, aguacate y huevo',
+    tagline:'Grasas buenas, proteína y fibra. Lo mejor para aguantar la mañana.',
+    ingredients:[
+      {n:'Pan integral tostado', q:'2 rebanadas'},
+      {n:'Aguacate maduro', q:'½ ud'},
+      {n:'Huevo', q:'1 ud'},
+      {n:'Sal en escamas + limón', q:'al gusto'},
+      {n:'Chile en copos (opcional)', q:'pizca'},
+    ],
+    steps:[
+      {t:'Tuesta el pan',d:'2-3 min en tostadora.'},
+      {t:'Aguacate',d:'Chafa el aguacate con un tenedor, sal y unas gotas de limón.'},
+      {t:'Huevo',d:'Fríe 1 huevo en sartén con AOVE a fuego medio-bajo, 3 min. La yema tiene que quedar un poco líquida.'},
+      {t:'Monta',d:'Aguacate encima del pan, huevo encima del aguacate. Chile en copos si quieres.'},
+    ],
+    chips:[{t:'~22 g prot',cls:'prot'},{t:'~420 kcal',cls:'kcal'},{t:'8 min',cls:'time'}],
+    prepNote: null,
+  },
+  {
+    id:'C', label:'Tortilla de claras con espinacas',
+    tagline:'Alta proteína, muy poca grasa. Ideal antes de entrenar.',
+    ingredients:[
+      {n:'Claras de huevo', q:'4 ud'},
+      {n:'Huevo entero', q:'1 ud'},
+      {n:'Espinacas baby', q:'un puñado'},
+      {n:'Queso fresco batido', q:'2 cdas'},
+      {n:'Sal y pimienta', q:'al gusto'},
+    ],
+    steps:[
+      {t:'Bate',d:'4 claras + 1 huevo entero con sal y pimienta.'},
+      {t:'Espinacas',d:'Saltea las espinacas 1 min en sartén con AOVE.'},
+      {t:'Tortilla',d:'Añade el batido de huevos. Fuego medio. Cuaja 3-4 min.'},
+      {t:'Sirve',d:'Con una cucharada de queso fresco batido encima.'},
+    ],
+    chips:[{t:'~30 g prot',cls:'prot'},{t:'~280 kcal',cls:'kcal'},{t:'8 min',cls:'time'}],
+    prepNote: null,
+  },
+  {
+    id:'D', label:'Avena proteica con canela',
+    tagline:'Energía lenta para toda la mañana. Ponla a calentar mientras te duchas.',
+    ingredients:[
+      {n:'Avena en copos', q:'60 g'},
+      {n:'Leche semidesnatada', q:'200 ml'},
+      {n:'Proteína en polvo o yogur', q:'1 cacito / 150 g'},
+      {n:'Plátano', q:'½ ud'},
+      {n:'Canela molida', q:'½ cdta'},
+    ],
+    steps:[
+      {t:'Cuece',d:'Avena + leche en un cazo 3-4 min a fuego medio, removiendo.'},
+      {t:'Proteína',d:'Fuera del fuego, añade el yogur griego o la proteína y mezcla bien.'},
+      {t:'Sirve',d:'En bol, plátano en rodajas encima, canela y listo.'},
+    ],
+    chips:[{t:'~28 g prot',cls:'prot'},{t:'~380 kcal',cls:'kcal'},{t:'5 min',cls:'time'}],
+    prepNote: null,
+  },
+];
+
+/* ─── MENÚ SEMANAL ───────────────────────── */
+const MENU = {
+  1: { /* LUNES */
+    comida: {
+      name:'Solomillo de pollo al curry con arroz basmati',
+      tagline:'Especiado, aromático y saciante. El curry en polvo hace todo el trabajo.',
+      mins:22, prot:55, kcal:590,
+      icon:'🍛',
+      prepNote:'El arroz puede estar precocido del domingo. Solo caliéntalo 2 min al micro.',
+      ingredients:[
+        {n:'Pechuga de pollo (tiras)', q:'400 g'},
+        {n:'Arroz basmati', q:'160 g'},
+        {n:'Cebolla', q:'1 ud'},
+        {n:'Ajo', q:'2 dientes'},
+        {n:'Curry en polvo', q:'1½ cdta'},
+        {n:'Leche de coco (brick pequeño)', q:'100 ml'},
+        {n:'Tomate triturado', q:'3 cdas'},
+        {n:'Espinacas baby', q:'un puñado'},
+        {n:'AOVE + sal + pimienta', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Arroz',d:'Cuece el basmati según el paquete (12-14 min). Si tienes del domingo, sáltate este paso.'},
+        {t:'Sofrito',d:'Pica la cebolla y el ajo. Pocha en AOVE 5 min a fuego medio.'},
+        {t:'Pollo',d:'Añade el pollo en tiras, salpimenta, 5-6 min hasta que no quede rosa.'},
+        {t:'Curry',d:'Incorpora el curry, remueve 1 min para que se tueste.'},
+        {t:'Salsa',d:'Añade el tomate triturado y la leche de coco. Baja el fuego, 8 min.'},
+        {t:'Espinacas',d:'Añade las espinacas al final, remueve hasta que se bajen.'},
+        {t:'Sirve',d:'Sobre el arroz basmati. Squeeze de limón si tienes.'},
+      ],
+    },
+    cena: {
+      name:'Ensalada de pollo a la plancha con mango y almendras',
+      tagline:'Cena ligera pero con proteína de verdad. El mango la hace especial.',
+      mins:12, prot:38, kcal:380,
+      icon:'🥗',
+      prepNote: null,
+      ingredients:[
+        {n:'Pechuga de pollo', q:'280 g'},
+        {n:'Mix de hojas verdes', q:'1 bolsa'},
+        {n:'Mango o melocotón', q:'½ ud'},
+        {n:'Almendras laminadas', q:'20 g'},
+        {n:'Tomate cherry', q:'8 ud'},
+        {n:'Vinagre balsámico + AOVE', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Pollo',d:'Plancha el pollo entero con sal y ajo en polvo, 5-6 min por lado. Deja reposar 2 min y lamina.'},
+        {t:'Base',d:'Reparte las hojas en 2 platos. Tomates cherry partidos.'},
+        {t:'Fruta',d:'Añade el mango en dados.'},
+        {t:'Monta',d:'Pollo encima, almendras laminadas, chorrito de balsámico y AOVE.'},
+      ],
+    },
+  },
+  2: { /* MARTES */
+    comida: {
+      name:'Contramuslos de pollo en salsa de tomate y aceitunas',
+      tagline:'Plato de cazuela sin complicación. Resultado de restaurante en 25 min.',
+      mins:28, prot:52, kcal:580,
+      icon:'🫕',
+      prepNote: null,
+      ingredients:[
+        {n:'Contramuslos de pollo (sin piel)', q:'600 g'},
+        {n:'Tomate triturado', q:'400 ml'},
+        {n:'Aceitunas verdes sin hueso', q:'50 g'},
+        {n:'Cebolla', q:'1 ud'},
+        {n:'Pimiento rojo', q:'1 ud'},
+        {n:'Ajo', q:'3 dientes'},
+        {n:'Orégano + pimentón + laurel', q:'al gusto'},
+        {n:'Pan integral (para acompañar)', q:'2 rebanadas'},
+        {n:'AOVE + sal', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Sella el pollo',d:'Salpimenta los contramuslos. En sartén honda con AOVE fuerte, dora 4 min por lado. Reserva.'},
+        {t:'Sofrito',d:'Baja el fuego. En la misma sartén, añade cebolla, pimiento y ajo picados. 7 min.'},
+        {t:'Salsa',d:'Incorpora el tomate, el orégano, el pimentón y el laurel. 5 min.'},
+        {t:'Cazuela',d:'Devuelve el pollo a la sartén. Añade las aceitunas. Tapa y cocina 15 min a fuego bajo.'},
+        {t:'Sirve',d:'Con pan tostado para mojar la salsa.'},
+      ],
+    },
+    cena: {
+      name:'Huevos a la flamenca con chorizo',
+      tagline:'Cena contundente hecha en una sola sartén. Clásico reinventado.',
+      mins:15, prot:32, kcal:420,
+      icon:'🍳',
+      prepNote: null,
+      ingredients:[
+        {n:'Huevos', q:'4 ud'},
+        {n:'Chorizo en rodajas', q:'60 g'},
+        {n:'Tomate triturado', q:'200 ml'},
+        {n:'Pimiento rojo asado (del bote)', q:'2 tiras'},
+        {n:'Cebolla', q:'½ ud'},
+        {n:'Pan integral', q:'2 rebanadas'},
+        {n:'Pimentón + AOVE', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Sofrito rápido',d:'Cebolla picada + chorizo en sartén, 5 min. El chorizo suelta su grasa.'},
+        {t:'Tomate',d:'Añade el tomate triturado + pimentón. 5 min a fuego medio.'},
+        {t:'Huevos',d:'Haz 4 huecos en la salsa y casca 1 huevo en cada uno. Tapa.'},
+        {t:'Cuaja',d:'3-4 min a fuego bajo. La yema tiene que quedar melosa.'},
+        {t:'Sirve',d:'Con tiras de pimiento asado encima y pan tostado.'},
+      ],
+    },
+  },
+  3: { /* MIÉRCOLES */
+    comida: {
+      name:'Pasta rigatoni con ragú de ternera y parmesano',
+      tagline:'Una salsa de verdad, no de bote. 20 minutos y parece que llevas horas.',
+      mins:30, prot:54, kcal:620,
+      icon:'🍝',
+      prepNote: null,
+      ingredients:[
+        {n:'Rigatoni o penne (integral)', q:'200 g'},
+        {n:'Carne picada de ternera', q:'350 g'},
+        {n:'Cebolla', q:'1 ud'},
+        {n:'Zanahoria pequeña', q:'1 ud'},
+        {n:'Ajo', q:'2 dientes'},
+        {n:'Tomate triturado', q:'400 ml'},
+        {n:'Vino tinto (o caldo)', q:'100 ml'},
+        {n:'Parmesano rallado', q:'30 g'},
+        {n:'Orégano + laurel + AOVE', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Sofrito',d:'Pica fino la cebolla, la zanahoria y el ajo. Pocha en AOVE 6-7 min.'},
+        {t:'Carne',d:'Sube el fuego, añade la carne y desmenuza bien. 5 min hasta que cambie de color.'},
+        {t:'Desglasar',d:'Echa el vino y deja evaporar 2 min.'},
+        {t:'Salsa',d:'Añade el tomate, el orégano y el laurel. Fuego bajo, 15 min tapado.'},
+        {t:'Pasta',d:'Mientras tanto cuece la pasta al dente según el paquete.'},
+        {t:'Mezcla',d:'Incorpora la pasta a la salsa, 1 min al fuego para que se integre. Parmesano por encima.'},
+      ],
+    },
+    cena: {
+      name:'Bol de quinoa, garbanzos y verduras asadas',
+      tagline:'Cena que parece de restaurante saludable. Sin cocinar proteína porque la quinoa y los garbanzos la aportan.',
+      mins:20, prot:28, kcal:420,
+      icon:'🥙',
+      prepNote:'Si preparas la quinoa el domingo junto al arroz, esta cena se monta en 5 minutos.',
+      ingredients:[
+        {n:'Quinoa', q:'120 g'},
+        {n:'Garbanzos cocidos (bote)', q:'½ bote'},
+        {n:'Pimiento rojo y amarillo', q:'1 de cada'},
+        {n:'Cebolla morada', q:'½ ud'},
+        {n:'Pepino', q:'½ ud'},
+        {n:'Tahini o yogur griego', q:'2 cdas'},
+        {n:'Limón + AOVE + comino', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Quinoa',d:'Cuece en agua con sal (1 parte quinoa, 2 de agua), 12-15 min. Deja reposar.'},
+        {t:'Verduras',d:'Pimiento en tiras con AOVE en sartén, 7 min. Añade los garbanzos los últimos 2 min.'},
+        {t:'Frescas',d:'Pepino y cebolla morada en dados pequeños.'},
+        {t:'Salsa',d:'Mezcla el tahini con zumo de limón, sal y un chorrito de agua hasta que emulsione.'},
+        {t:'Monta el bol',d:'Quinoa de base, verduras encima, crudas por encima. Salsa de tahini.'},
+      ],
+    },
+  },
+  4: { /* JUEVES */
+    comida: {
+      name:'Solomillo de pavo a la mostaza con boniato al horno',
+      tagline:'Pavo jugoso con costra de mostaza y miel. El boniato hace el trabajo en el horno.',
+      mins:30, prot:58, kcal:560,
+      icon:'🍖',
+      prepNote: null,
+      ingredients:[
+        {n:'Solomillo de pavo', q:'500 g'},
+        {n:'Boniato', q:'2 medianos'},
+        {n:'Mostaza de Dijon', q:'2 cdas'},
+        {n:'Miel', q:'1 cda'},
+        {n:'Ajo en polvo + romero', q:'al gusto'},
+        {n:'Mix de hojas para acompañar', q:'1 bolsa'},
+        {n:'AOVE + sal + pimienta', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Horno 200°C',d:'Boniato en gajos con AOVE + sal + romero en bandeja. Entran al horno 25 min.'},
+        {t:'Marinada',d:'Mezcla la mostaza + miel + ajo en polvo + pimienta. Unta el solomillo por todos lados.'},
+        {t:'Sella',d:'En sartén caliente con AOVE, dora el solomillo 2 min por cada lado.'},
+        {t:'Horno',d:'Pasa el solomillo a la bandeja del boniato los últimos 12-14 min.'},
+        {t:'Reposo',d:'Saca y deja reposar 3 min antes de cortar. Jugosísimo.'},
+        {t:'Sirve',d:'Con el boniato y hojas verdes con AOVE.'},
+      ],
+    },
+    cena: {
+      name:'Lentejas rojas con leche de coco y cúrcuma',
+      tagline:'No son las lentejas de siempre. Cremosas, especiadas y listas en 18 minutos.',
+      mins:18, prot:30, kcal:440,
+      icon:'🫘',
+      prepNote: null,
+      ingredients:[
+        {n:'Lentejas rojas secas', q:'180 g'},
+        {n:'Leche de coco (brick pequeño)', q:'150 ml'},
+        {n:'Cebolla', q:'1 ud'},
+        {n:'Ajo', q:'2 dientes'},
+        {n:'Jengibre rallado (o en polvo)', q:'½ cdta'},
+        {n:'Cúrcuma + comino + pimentón', q:'1 cdta cada uno'},
+        {n:'Espinacas baby', q:'un puñado'},
+        {n:'Limón + AOVE', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Sofrito',d:'Cebolla y ajo picados en AOVE, 5 min. Añade el jengibre y las especias, 1 min más.'},
+        {t:'Lentejas',d:'Añade las lentejas lavadas + 500 ml de agua. Hierve 12 min.'},
+        {t:'Coco',d:'Cuando estén tiernas, añade la leche de coco. Remueve.'},
+        {t:'Espinacas',d:'Incorpora las espinacas y apaga el fuego. Se bajan solas.'},
+        {t:'Sirve',d:'Con zumo de limón por encima. Son cremosas y muy saciantes.'},
+      ],
+    },
+  },
+  5: { /* VIERNES */
+    comida: {
+      name:'Hamburguesas caseras de ternera con patatas al horno',
+      tagline:'Viernes = darte el gusto sin salirte. Hecho en casa y sin aceite frito.',
+      mins:30, prot:58, kcal:640,
+      icon:'🍔',
+      prepNote: null,
+      ingredients:[
+        {n:'Carne picada de ternera', q:'400 g'},
+        {n:'Patatas medianas', q:'4 ud'},
+        {n:'Pan de hamburguesa integral', q:'2 ud'},
+        {n:'Lechuga + tomate + cebolla', q:'al gusto'},
+        {n:'Queso lonchas (opcional)', q:'2 ud'},
+        {n:'Sal + pimienta + ajo en polvo', q:'al gusto'},
+        {n:'Mostaza o kétchup sin azúcar', q:'al gusto'},
+        {n:'AOVE + romero', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Horno 200°C',d:'Patatas en gajos finos con AOVE + sal + romero. 25 min dando vuelta a mitad.'},
+        {t:'Hamburguesas',d:'Mezcla la carne con sal, pimienta y ajo en polvo. Forma 2 hamburgesas compactas de 200 g.'},
+        {t:'Plancha fuerte',d:'Sartén o plancha al máximo. 3-4 min por lado sin tocar. Queso encima el último minuto si quieres.'},
+        {t:'Pan',d:'Tuesta el pan 1 min en la misma plancha.'},
+        {t:'Monta',d:'Lechuga + tomate + cebolla + hamburguesa + salsa. Las patatas de acompañamiento.'},
+      ],
+    },
+    cena: {
+      name:'Crema de puerro y patata con jamón crujiente',
+      tagline:'La crema más fácil del mundo. El jamón crujiente la eleva a otro nivel.',
+      mins:20, prot:22, kcal:340,
+      icon:'🍲',
+      prepNote: null,
+      ingredients:[
+        {n:'Puerros', q:'2 ud'},
+        {n:'Patata mediana', q:'2 ud'},
+        {n:'Caldo de verduras o pollo', q:'600 ml'},
+        {n:'Jamón serrano en lonchas', q:'3 ud'},
+        {n:'Nata para cocinar (opcional)', q:'50 ml'},
+        {n:'Nuez moscada + sal + pimienta', q:'al gusto'},
+        {n:'AOVE', q:'1 cda'},
+      ],
+      steps:[
+        {t:'Sofrito',d:'Puerros en rodajas en AOVE, 5 min a fuego medio.'},
+        {t:'Patata',d:'Añade la patata pelada en dados + caldo. Hierve 12-15 min hasta que esté blanda.'},
+        {t:'Tritura',d:'Tritura con batidora hasta que quede muy suave. Añade la nata si quieres. Salpimenta.'},
+        {t:'Jamón crujiente',d:'En sartén sin aceite, jamón 2 min por lado hasta que quede crujiente. Rompe en trozos.'},
+        {t:'Sirve',d:'Crema en bol, jamón crujiente por encima. Un hilo de AOVE.'},
+      ],
+    },
+  },
+  6: { /* SÁBADO */
+    comida: {
+      name:'Pechuga rellena de mozzarella y tomate seco al horno',
+      tagline:'Parece complicado y no lo es. El horno hace el trabajo.',
+      mins:30, prot:62, kcal:560,
+      icon:'🧀',
+      prepNote: null,
+      ingredients:[
+        {n:'Pechugas grandes', q:'2 ud'},
+        {n:'Mozzarella fresca', q:'1 bola'},
+        {n:'Tomates secos en aceite', q:'4 ud'},
+        {n:'Espinacas baby', q:'un puñado'},
+        {n:'Ensalada verde para acompañar', q:'1 bolsa'},
+        {n:'Ajo + orégano + AOVE', q:'al gusto'},
+        {n:'Palillos de madera', q:'4 ud'},
+      ],
+      steps:[
+        {t:'Horno 200°C',d:'Precalienta el horno.'},
+        {t:'Abre las pechugas',d:'Con un cuchillo afilado, corta cada pechuga por la mitad sin llegar al otro extremo, como un libro.'},
+        {t:'Rellena',d:'Dentro de cada pechuga: espinacas + mozzarella en lonchas + tomates secos picados + orégano.'},
+        {t:'Cierra',d:'Dobla la pechuga y cierra con 2 palillos. Salpimenta por fuera y unta AOVE.'},
+        {t:'Horno',d:'En bandeja, 22-25 min. Los últimos 3 min con el grill para que dore.'},
+        {t:'Sirve',d:'Con ensalada verde aliñada con AOVE y sal.'},
+      ],
+    },
+    cena: {
+      name:'Revuelto de champiñones, gamba y ajo',
+      tagline:'Sábado noche sin esfuerzo. En 10 minutos tienes una cena de 10.',
+      mins:10, prot:34, kcal:320,
+      icon:'🍤',
+      prepNote: null,
+      ingredients:[
+        {n:'Champiñones laminados', q:'250 g'},
+        {n:'Gambas peladas congeladas', q:'200 g'},
+        {n:'Huevos', q:'4 ud'},
+        {n:'Ajo', q:'3 dientes'},
+        {n:'Perejil fresco o seco', q:'al gusto'},
+        {n:'Guindilla (opcional)', q:'pizca'},
+        {n:'AOVE + sal', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Gambas',d:'Descongela las gambas bajo agua fría 5 min. Sécalas con papel.'},
+        {t:'Ajo y guindilla',d:'Láminas de ajo en AOVE fuerte + guindilla, 1 min sin que queme.'},
+        {t:'Champiñones',d:'Sube el fuego. Champiñones laminados, 4-5 min hasta que suelten agua y se doren.'},
+        {t:'Gambas',d:'Añade las gambas, 2 min hasta que estén rosadas.'},
+        {t:'Huevos',d:'Baja el fuego. 4 huevos batidos, remueve suave hasta que cuajen jugosos. Apaga antes de que estén del todo.'},
+        {t:'Perejil',d:'Por encima. Pan integral tostado para acompañar.'},
+      ],
+    },
+  },
+  0: { /* DOMINGO */
+    comida: {
+      name:'Pollo asado al limón con patatas y cebolla',
+      tagline:'El clásico dominical. El olor solo ya justifica el rato en casa.',
+      mins:50, prot:60, kcal:600,
+      icon:'🍗',
+      prepNote:'Haz el doble de pollo y guarda la mitad para ensaladas del lunes y martes. 10 minutos extra, 3 días de proteína lista.',
+      ingredients:[
+        {n:'Muslos o contramuslos de pollo', q:'1.2 kg'},
+        {n:'Patatas', q:'600 g'},
+        {n:'Cebolla', q:'2 ud'},
+        {n:'Limón', q:'1 ud'},
+        {n:'Ajo', q:'1 cabeza'},
+        {n:'Romero + tomillo + orégano', q:'al gusto'},
+        {n:'Vino blanco o caldo', q:'100 ml'},
+        {n:'AOVE + sal + pimienta', q:'al gusto'},
+      ],
+      steps:[
+        {t:'Horno 180°C',d:'Precalienta el horno.'},
+        {t:'Patatas y cebolla',d:'Patatas en gajos + cebolla en cuartos en bandeja grande. AOVE, sal, pimienta.'},
+        {t:'Pollo encima',d:'Coloca el pollo sobre las verduras. Frota con AOVE + sal + hierbas.'},
+        {t:'Limón y ajo',d:'Exprime medio limón por encima. El otro medio y la cabeza de ajo entera entre el pollo.'},
+        {t:'Vino',d:'Echa el vino o el caldo por los bordes de la bandeja.'},
+        {t:'Horno',d:'40-45 min. A los 20 min riega el pollo con el jugo. Los últimos 5 min sube a 220°C para que dore la piel.'},
+      ],
+    },
+    cena: {
+      name:'Tortilla española de la abuela',
+      tagline:'Con lo que queda de semana. La tortilla perfecta es la que no tiene prisa.',
+      mins:25, prot:28, kcal:420,
+      icon:'🥚',
+      prepNote:'Es el momento de usar los huevos que queden de la semana.',
+      ingredients:[
+        {n:'Huevos', q:'6 ud'},
+        {n:'Patatas', q:'3 medianas'},
+        {n:'Cebolla', q:'1 ud'},
+        {n:'AOVE', q:'200 ml (para confitar)'},
+        {n:'Sal', q:'generosa'},
+      ],
+      steps:[
+        {t:'Confitar',d:'Patata en rodajas finas + cebolla en juliana + sal en sartén honda con AOVE. Fuego bajo-medio 18-20 min. No tienen que freírse, sino ablandarse. Remueve de vez en cuando.'},
+        {t:'Escurre',d:'Cuela las patatas y reserva el aceite (guárdalo, sirve para todo).'},
+        {t:'Huevos',d:'Bate los 6 huevos con sal. Mezcla las patatas con los huevos. Deja reposar 2 min.'},
+        {t:'Primera cara',d:'En sartén antiadherente con 2 cdas del aceite reservado a fuego medio. Vierte la mezcla. 4-5 min tapada hasta que los bordes cuajen pero el centro esté cremoso.'},
+        {t:'Voltear',d:'El momento clave: plato encima, volteo rápido, desliza la tortilla de vuelta. 2-3 min más.'},
+        {t:'Sirve',d:'Ligeramente jugosa en el centro. Con pan y una ensalada verde.'},
+      ],
+    },
+  },
+};
+
+/* ─── SHOPPING ───────────────────────────── */
+const SHOP = {
+  '🥩 Carnes': [
+    {n:'Pechugas de pollo', q:'1 kg'},
+    {n:'Contramuslos de pollo (sin piel)', q:'1 kg'},
+    {n:'Muslos de pollo (domingo)', q:'1.2 kg'},
+    {n:'Carne picada de ternera', q:'800 g'},
+    {n:'Solomillo de pavo', q:'600 g'},
+    {n:'Chorizo para cocinar', q:'150 g'},
+    {n:'Jamón serrano en lonchas', q:'100 g'},
+  ],
+  '🥚 Huevos y lácteos': [
+    {n:'Huevos L', q:'18 ud'},
+    {n:'Mozzarella fresca', q:'2 bolas'},
+    {n:'Yogur griego proteico', q:'1 kg'},
+    {n:'Queso fresco batido', q:'500 g'},
+    {n:'Nata para cocinar', q:'200 ml'},
+    {n:'Leche semidesnatada', q:'1 L'},
+  ],
+  '🫘 Legumbres y conservas': [
+    {n:'Garbanzos cocidos (botes)', q:'2 ud'},
+    {n:'Lentejas rojas secas', q:'500 g'},
+    {n:'Tomate triturado (botes)', q:'2 ud'},
+    {n:'Pimientos asados en bote', q:'1 ud'},
+    {n:'Leche de coco (bricks pequeños)', q:'2 ud'},
+    {n:'Tomates secos en aceite', q:'1 bote'},
+    {n:'Gambas peladas congeladas', q:'200 g'},
+  ],
+  '🥦 Verduras': [
+    {n:'Cebollas', q:'5 ud'},
+    {n:'Cebolla morada', q:'1 ud'},
+    {n:'Ajo (cabezas)', q:'2 ud'},
+    {n:'Puerros', q:'2 ud'},
+    {n:'Pimiento rojo', q:'3 ud'},
+    {n:'Pimiento amarillo', q:'1 ud'},
+    {n:'Champiñones', q:'250 g'},
+    {n:'Zanahoria', q:'3 ud'},
+    {n:'Espinacas baby (bolsas)', q:'2 ud'},
+    {n:'Mix hojas verdes (bolsas)', q:'2 ud'},
+    {n:'Pepino', q:'1 ud'},
+    {n:'Tomates cherry', q:'1 bandeja'},
+    {n:'Tomates maduros', q:'500 g'},
+  ],
+  '🍎 Fruta': [
+    {n:'Plátanos', q:'6 ud'},
+    {n:'Manzanas', q:'5 ud'},
+    {n:'Limones', q:'4 ud'},
+    {n:'Aguacates', q:'3 ud'},
+    {n:'Mango o melocotón (según temporada)', q:'1 ud'},
+    {n:'Frutos rojos (bandeja)', q:'1 ud'},
+  ],
+  '🌾 Hidratos': [
+    {n:'Arroz basmati', q:'1 kg'},
+    {n:'Quinoa', q:'500 g'},
+    {n:'Pasta integral (rigatoni/penne)', q:'500 g'},
+    {n:'Patatas', q:'2 kg'},
+    {n:'Boniato', q:'2 ud'},
+    {n:'Pan integral de molde', q:'1 ud'},
+    {n:'Pan de hamburguesa integral', q:'4 ud'},
+    {n:'Avena en copos', q:'500 g'},
+    {n:'Granola sin azúcar', q:'300 g'},
+  ],
+  '🫒 Despensa': [
+    {n:'Aceite de oliva virgen extra', q:'1 botella'},
+    {n:'Curry en polvo', q:'1 bote'},
+    {n:'Cúrcuma', q:'1 bote'},
+    {n:'Comino molido', q:'1 bote'},
+    {n:'Pimentón ahumado', q:'1 bote'},
+    {n:'Orégano seco', q:'1 bote'},
+    {n:'Mostaza de Dijon', q:'1 bote'},
+    {n:'Miel', q:'1 bote'},
+    {n:'Tahini (opcional)', q:'1 bote'},
+    {n:'Almendras laminadas', q:'100 g'},
+    {n:'Caldo de pollo (brick)', q:'1 ud'},
+    {n:'Caldo de verduras (brick)', q:'1 ud'},
+    {n:'Vino blanco para cocinar', q:'1 brick'},
+  ],
+};
+
+/* ─── PREP POR DÍA ──────────────────────── */
+const PREP_DAYS = [
+  {
+    day: 'Domingo (30 min — ahorra tiempo toda la semana)',
+    meta: 'Hazlo una vez, come bien los 7 días',
+    items: [
+      {ico:'🍚', txt:'Cocer 600 g de arroz basmati. Dividir en 3 tuppers y refrigerar.'},
+      {ico:'🌾', txt:'Cocer 300 g de quinoa. Guardar en tupper, aguanta 5 días.'},
+      {ico:'🥚', txt:'Cocer 6 huevos duros. Guardar sin pelar en nevera.'},
+      {ico:'🧄', txt:'Pelar y laminar 2 cabezas de ajo enteras. En tupper hermético.'},
+      {ico:'🥗', txt:'Lavar y centrifugar las bolsas de hojas. Tupper con papel de cocina.'},
+      {ico:'🍗', txt:'Si haces más pollo asado, desmenúzalo y guarda en tupper.'},
+    ]
+  },
+  {
+    day: 'Lunes (5 min)',
+    meta: 'Antes de cenar',
+    items: [
+      {ico:'🫘', txt:'Abrir y escurrir el bote de garbanzos para la ensalada de la noche.'},
+      {ico:'❄️', txt:'Sacar gambas del congelador al frigo si el sábado comes en casa.'},
+    ]
+  },
+  {
+    day: 'Miércoles (5 min)',
+    meta: 'Prepara para los últimos días',
+    items: [
+      {ico:'🥦', txt:'Cortar cebolla y pimiento en dados. Guardar en tupper para sofrito.'},
+      {ico:'🍋', txt:'Exprimir 2 limones, guardar el zumo en un tarrito.'},
+    ]
+  },
+  {
+    day: 'Jueves (3 min)',
+    meta: 'Noche',
+    items: [
+      {ico:'🥩', txt:'Sacar el solomillo de pavo del frío 20 min antes de cocinar.'},
+      {ico:'🫘', txt:'Lavar las lentejas rojas y reservar en cuenco con agua.'},
+    ]
+  },
+  {
+    day: 'Viernes (3 min)',
+    meta: 'Antes de cocinar',
+    items: [
+      {ico:'🍔', txt:'Sacar la carne picada del frío 15 min antes para que esté a temperatura.'},
+      {ico:'🥔', txt:'Lavar y cortar las patatas en gajos, meter al horno primero.'},
+    ]
+  },
+];
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let selDay = new Date().getDay();
+let shopCk  = JSON.parse(localStorage.getItem('mesa_shop') || '{}');
+let prepCk  = JSON.parse(localStorage.getItem('mesa_prep') || '{}');
+
+/* ════════════════════════════════════════════
+   CLOCK
+════════════════════════════════════════════ */
+function tick() {
+  const n = new Date();
+  const h = String(n.getHours()).padStart(2,'0');
+  const m = String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = h + ':' + m;
+}
+setInterval(tick, 1000); tick();
+
+/* ════════════════════════════════════════════
+   DAY STRIP
+════════════════════════════════════════════ */
+function buildStrip() {
+  const today = new Date().getDay();
+  const el = document.getElementById('dayStrip');
+  el.innerHTML = '';
+  for (let i = 0; i < 7; i++) {
+    const b = document.createElement('button');
+    b.className = 'dp' + (i === today ? ' today' : '') + (i === selDay ? ' sel' : '');
+    b.innerHTML = `<span class="dnum">${i === today ? '◉' : (i+1)}</span>${DAYS_S[i]}`;
+    b.onclick = () => { selDay = i; buildStrip(); renderHoy(); };
+    el.appendChild(b);
+  }
+  setTimeout(() => {
+    const a = el.querySelector('.sel');
+    if (a) a.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, 40);
+}
+
+/* ════════════════════════════════════════════
+   SHEET
+════════════════════════════════════════════ */
+function openSheet(html) {
+  document.getElementById('sheetScroll').innerHTML = html;
+  document.getElementById('sheet').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('sheetScroll').scrollTop = 0;
+}
+function closeSheet() {
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+/* ─── build recipe sheet content ─────────── */
+function recipeSheetHTML(recipe, mealType) {
+  const labelClass = mealType === 'comida' ? 'ml-comida' : mealType === 'cena' ? 'ml-cena' : 'ml-desay';
+  const labelText = mealType === 'comida' ? '☀️ Comida' : mealType === 'cena' ? '🌙 Cena' : '☕ Desayuno';
+
+  const ingredientsHTML = recipe.ingredients
+    .map(i => `<div class="ingredient">
+      <div class="ing-dot"></div>
+      <span class="ing-name">${i.n}</span>
+      <span class="ing-qty">${i.q}</span>
+    </div>`).join('');
+
+  const stepsHTML = recipe.steps.map((s, idx) => `
+    <div class="step-row">
+      <div class="step-num-wrap">
+        <div class="step-num">${idx + 1}</div>
+        ${idx < recipe.steps.length - 1 ? '<div class="step-connector"></div>' : ''}
+      </div>
+      <div class="step-body">
+        <div class="step-title">${s.t}</div>
+        <div class="step-desc">${s.d}</div>
+      </div>
+    </div>`).join('');
+
+  const chipsHTML = (recipe.chips || [
+    {t: `${recipe.prot}g proteína`, cls:'prot'},
+    {t: `${recipe.kcal} kcal`, cls:'kcal'},
+    {t: `${recipe.mins} min`, cls:'time'},
+    {t: 'Fácil', cls:'easy'},
+  ]).map(c => `<span class="sh-chip ${c.cls}">${c.t}</span>`).join('');
+
+  const prepNoteHTML = recipe.prepNote ? `
+    <div class="sh-divider"></div>
+    <div class="prep-note">
+      <div class="prep-note-ico">💡</div>
+      <div class="prep-note-txt"><b>Tip de preparación:</b> ${recipe.prepNote}</div>
+    </div>` : '';
+
+  return `
+    <div class="sheet-eyebrow"><span class="meal-label ${labelClass}">${labelText}</span></div>
+    <div class="sheet-title">${recipe.name}</div>
+    <div class="sheet-tagline">${recipe.tagline}</div>
+    <div class="sheet-chips">${chipsHTML}</div>
+    <div class="sh-divider"></div>
+    <div class="sh-section-title">Ingredientes · 2 personas</div>
+    <div class="ingredient-list">${ingredientsHTML}</div>
+    ${prepNoteHTML}
+    <div class="sh-divider"></div>
+    <div class="sh-section-title">Preparación</div>
+    <div class="steps-list">${stepsHTML}</div>
+  `;
+}
+
+/* ════════════════════════════════════════════
+   NOW LOGIC
+════════════════════════════════════════════ */
+const BLOCKS = [
+  {h:7,  m:30, type:'d',  label:'Desayuno',  title:'Hora del desayuno'},
+  {h:10, m:30, type:'s',  label:'Snack',      title:'Tentempié'},
+  {h:14, m:0,  type:'c',  label:'Comida',     title:'__comida'},
+  {h:17, m:30, type:'s',  label:'Merienda',   title:'Merienda'},
+  {h:21, m:0,  type:'ce', label:'Cena',       title:'__cena'},
+  {h:23, m:0,  type:'p',  label:'Para mañana',title:'Prepara para mañana'},
+];
+
+function getNowBlock(h, m) {
+  const t = h * 60 + m;
+  for (let i = BLOCKS.length - 1; i >= 0; i--) {
+    if (t >= BLOCKS[i].h * 60 + BLOCKS[i].m) return i;
+  }
+  return null;
+}
+
+/* ════════════════════════════════════════════
+   VIEW: HOY
+════════════════════════════════════════════ */
+function renderHoy() {
+  const now = new Date();
+  const h = now.getHours(), m = now.getMinutes();
+  const todayIdx = now.getDay();
+  const isToday = selDay === todayIdx;
+  const menu = MENU[selDay];
+  const dayName = DAYS_L[selDay];
+  const cb = isToday ? getNowBlock(h, m) : null;
+
+  /* now banner */
+  let nowHTML = '';
+  if (isToday && cb !== null) {
+    const bl = BLOCKS[cb];
+    let title = bl.title;
+    if (title === '__comida') title = menu?.comida?.name || 'Comida';
+    if (title === '__cena')   title = menu?.cena?.name   || 'Cena';
+    let tag = '';
+    if (bl.type === 'c')  tag = `<span class="ntag ntag-sage">🍴 Es hora de comer</span>`;
+    else if (bl.type === 'ce') tag = `<span class="ntag ntag-copper">🌙 Es hora de cenar</span>`;
+    else if (bl.type === 'd')  tag = `<span class="ntag ntag-gold">☀️ Buenos días</span>`;
+    else if (bl.type === 's')  tag = `<span class="ntag ntag-sage">🍎 Recarga</span>`;
+    else                       tag = `<span class="ntag ntag-copper">💤 Descanso</span>`;
+    nowHTML = `<div class="now-card">
+      <div class="now-eyebrow">⚡ Ahora · ${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}</div>
+      <div class="now-title">${title}</div>
+      <div class="now-sub">${bl.type === 'c' ? 'Comida del mediodía' : bl.type === 'ce' ? 'Cena de la noche' : bl.label + ' — ' + dayName}</div>
+      <div class="now-tags">${tag}</div>
+    </div>`;
+  } else if (!isToday) {
+    nowHTML = `<div class="now-card">
+      <div class="now-eyebrow">📅 Consultando</div>
+      <div class="now-title">${dayName}</div>
+      <div class="now-sub">Aquí tienes el menú de este día.</div>
+    </div>`;
+  } else {
+    nowHTML = `<div class="now-card">
+      <div class="now-eyebrow">🌙 Buenas noches</div>
+      <div class="now-title">Descansa</div>
+      <div class="now-sub">Mañana otro día. Si toca, saca algo del congelador.</div>
+    </div>`;
+  }
+
+  /* macros */
+  const totalKcal = (menu?.comida?.kcal||0) + (menu?.cena?.kcal||0) + 400;
+  const totalProt = (menu?.comida?.prot||0) + (menu?.cena?.prot||0) + 22;
+  const macrosHTML = `<div class="macro-row">
+    <div class="macro-box"><div class="macro-val kc">${totalKcal}</div><div class="macro-lbl">Kcal</div></div>
+    <div class="macro-box"><div class="macro-val pr">${totalProt}g</div><div class="macro-lbl">Prot.</div></div>
+    <div class="macro-box"><div class="macro-val ti">${menu?.comida?.mins||0}+${menu?.cena?.mins||0}<span style="font-size:11px">m</span></div><div class="macro-lbl">Cocina</div></div>
+    <div class="macro-box"><div class="macro-val di">Alta</div><div class="macro-lbl">Saciedad</div></div>
+  </div>`;
+
+  /* meal cards */
+  let mealsHTML = '';
+  if (menu) {
+    ['comida','cena'].forEach(tipo => {
+      const r = menu[tipo];
+      if (!r) return;
+      const labelClass = tipo === 'comida' ? 'ml-comida' : 'ml-cena';
+      const labelText  = tipo === 'comida' ? '☀️ Comida · 14:00' : '🌙 Cena · 21:00';
+      const pc = tipo === 'comida' ? 'ml-comida' : 'ml-cena';
+      mealsHTML += `<div class="meal-card" onclick="openSheet(recipeSheetHTML(MENU[${selDay}]['${tipo}'],'${tipo}'))">
+        <div class="meal-card-inner">
+          <div class="meal-card-top">
+            <span class="meal-label ${labelClass}">${labelText}</span>
+          </div>
+          <div class="meal-name">${r.icon} ${r.name}</div>
+          <div class="meal-tagline">${r.tagline}</div>
+          <div class="meal-footer">
+            <div class="meal-chips">
+              <span class="chip prot">${r.prot}g prot.</span>
+              <span class="chip kcal">${r.kcal} kcal</span>
+              <span class="chip">${r.mins} min</span>
+            </div>
+            <div class="meal-arrow">›</div>
+          </div>
+        </div>
+        ${r.prepNote ? `<div class="meal-divider"></div>
+        <div class="meal-prep-strip"><div class="prep-dot"></div> Hay tip de preparación</div>` : ''}
+      </div>`;
+    });
+  }
+
+  /* desayunos */
+  const bfastsHTML = `<div class="sec-head">Elige tu desayuno</div>
+  <div class="bf-grid">
+    ${BFASTS.map(b => `
+    <div class="bf-card" onclick="openSheet(recipeSheetHTML(BFASTS[${BFASTS.indexOf(b)}],'desay'))">
+      <div class="bf-letter">${b.id}</div>
+      <div>
+        <div class="bf-name">${b.label}</div>
+        <div class="bf-items">${b.items}</div>
+      </div>
+    </div>`).join('')}
+  </div>`;
+
+  /* monday shop alert */
+  const mondayAlert = selDay === 1 ? `
+    <div class="info-banner" style="border-color:rgba(122,184,138,.25);background:rgba(122,184,138,.06)">
+      <div class="ib-icon">🛒</div>
+      <div class="ib-body">
+        <div class="ib-title">¡Hoy toca la compra semanal!</div>
+        <div class="ib-text">Lista completa lista en la pestaña <b style="color:var(--sage)">Compra</b>. Todo en Mercadona.</div>
+      </div>
+    </div>` : '';
+
+  const sundayAlert = selDay === 0 ? `
+    <div class="info-banner">
+      <div class="ib-icon">⏱️</div>
+      <div class="ib-body">
+        <div class="ib-title">30 minutos de prep ahora = semana tranquila</div>
+        <div class="ib-text">Ve a <b>Prep</b> para ver qué hacer hoy y ahorrar tiempo los próximos días.</div>
+      </div>
+    </div>` : '';
+
+  document.getElementById('vhoy').innerHTML =
+    nowHTML + mondayAlert + sundayAlert +
+    macrosHTML +
+    `<div class="sec-head">Las comidas de hoy</div>` +
+    mealsHTML +
+    bfastsHTML;
+}
+
+/* ════════════════════════════════════════════
+   VIEW: SEMANA
+════════════════════════════════════════════ */
+function renderSemana() {
+  const today = new Date().getDay();
+  let html = `<div class="info-banner">
+    <div class="ib-icon">💡</div>
+    <div class="ib-body">
+      <div class="ib-title">Toca cualquier plato para ver la receta completa</div>
+      <div class="ib-text">Ingredientes, pasos y tips sin moverte de aquí.</div>
+    </div>
+  </div>`;
+
+  [1,2,3,4,5,6,0].forEach(d => {
+    const m = MENU[d];
+    const isT = d === today;
+    html += `<div class="week-day ${isT ? 'open' : ''}" id="wd${d}">
+      <div class="week-day-hdr" onclick="toggleWkDay(${d})">
+        <div class="week-day-name">
+          ${DAYS_L[d]}
+          ${isT ? '<span class="today-badge">Hoy</span>' : ''}
+        </div>
+        <div class="week-day-arrow">›</div>
+      </div>
+      <div class="week-day-body">
+        <div class="week-meal-row" onclick="openSheet(recipeSheetHTML(MENU[${d}].comida,'comida'))">
+          <div class="wm-icon">${m.comida.icon}</div>
+          <div class="wm-info">
+            <div class="wm-type c">☀️ Comida</div>
+            <div class="wm-name">${m.comida.name}</div>
+            <div class="wm-meta">${m.comida.mins} min · ${m.comida.prot}g prot. · ${m.comida.kcal} kcal</div>
+          </div>
+          <div class="wm-arrow">›</div>
+        </div>
+        <div class="week-meal-row" onclick="openSheet(recipeSheetHTML(MENU[${d}].cena,'cena'))">
+          <div class="wm-icon">${m.cena.icon}</div>
+          <div class="wm-info">
+            <div class="wm-type ce">🌙 Cena</div>
+            <div class="wm-name">${m.cena.name}</div>
+            <div class="wm-meta">${m.cena.mins} min · ${m.cena.prot}g prot. · ${m.cena.kcal} kcal</div>
+          </div>
+          <div class="wm-arrow">›</div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  document.getElementById('vsemana').innerHTML = html;
+}
+
+function toggleWkDay(d) {
+  const el = document.getElementById('wd' + d);
+  el.classList.toggle('open');
+}
+
+/* ════════════════════════════════════════════
+   VIEW: COMPRA
+════════════════════════════════════════════ */
+function renderCompra() {
+  const allItems = Object.values(SHOP).flat();
+  const ckCount  = allItems.filter((_,i) => shopCk[i]).length;
+  const pct = Math.round(ckCount / allItems.length * 100);
+
+  let html = `
+    <div class="shop-top">
+      <div class="shop-top-title">🏪 Mercadona · Semana completa</div>
+      <div class="shop-top-sub">Para 2 personas. Con margen por si os saltáis alguna comida.</div>
+      <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%"></div></div>
+      <div class="prog-label">${ckCount} de ${allItems.length} productos · ${pct}%</div>
+    </div>`;
+
+  let gi = 0;
+  Object.entries(SHOP).forEach(([cat, items]) => {
+    html += `<div class="shop-section">
+      <div class="shop-cat-lbl">${cat}</div>
+      <div class="shop-list">`;
+    items.forEach(item => {
+      const idx = gi;
+      html += `<div class="shop-item ${shopCk[idx] ? 'ck' : ''}" onclick="ckShop(${idx})">
+        <div class="s-check"><span class="s-check-mark">✓</span></div>
+        <span class="s-name">${item.n}</span>
+        <span class="s-qty">${item.q}</span>
+      </div>`;
+      gi++;
+    });
+    html += `</div></div>`;
+  });
+
+  html += `<button class="reset-btn" onclick="clearShop()">↺ Reiniciar lista de la compra</button>`;
+  document.getElementById('vcompra').innerHTML = html;
+}
+
+function ckShop(i) {
+  shopCk[i] = !shopCk[i];
+  localStorage.setItem('mesa_shop', JSON.stringify(shopCk));
+  renderCompra();
+}
+function clearShop() {
+  shopCk = {};
+  localStorage.setItem('mesa_shop', '{}');
+  renderCompra();
+}
+
+/* ════════════════════════════════════════════
+   VIEW: PREP
+════════════════════════════════════════════ */
+function renderPrep() {
+  let html = `<div class="info-banner">
+    <div class="ib-icon">🔪</div>
+    <div class="ib-body">
+      <div class="ib-title">Prep por día</div>
+      <div class="ib-text">Pequeñas acciones cada día que hacen que cocinar sea <b>10 veces más rápido</b>.</div>
+    </div>
+  </div>`;
+
+  PREP_DAYS.forEach((pd, pdIdx) => {
+    const items    = pd.items;
+    const ckCount  = items.filter((_, i) => prepCk[`${pdIdx}_${i}`]).length;
+    const pct      = Math.round(ckCount / items.length * 100);
+
+    html += `<div class="prep-day">
+      <div class="prep-day-hdr">
+        <div>
+          <div class="prep-day-title">${pd.day}</div>
+          <div class="prep-day-meta">${pd.meta}</div>
+        </div>
+        <div class="prep-day-pct">${pct}%</div>
+      </div>
+      <div class="prep-items">
+        ${items.map((item, i) => `
+          <div class="prep-item ${prepCk[pdIdx + '_' + i] ? 'ck' : ''}" onclick="ckPrep(${pdIdx}, ${i})">
+            <div class="prep-ico">${item.ico}</div>
+            <div class="prep-txt">${item.txt}</div>
+            <div class="prep-chk"><span class="prep-chk-mark">✓</span></div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  html += `
+    <div class="sec-head">Conservación</div>
+    <div class="prep-day">
+      <div class="prep-items">
+        <div class="prep-item"><div class="prep-ico">🧊</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Arroz y quinoa cocidos.</b> Tupper hermético en nevera, 4-5 días. Al micro 2 min para calentar.</div><div class="prep-chk" style="visibility:hidden"></div></div>
+        <div class="prep-item"><div class="prep-ico">🥚</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Huevos duros.</b> Sin pelar en nevera, hasta 1 semana.</div><div class="prep-chk" style="visibility:hidden"></div></div>
+        <div class="prep-item"><div class="prep-ico">🍗</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Pollo cocinado.</b> Tupper en nevera 3 días. Congela si es para más.</div><div class="prep-chk" style="visibility:hidden"></div></div>
+        <div class="prep-item"><div class="prep-ico">🥗</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Hojas lavadas.</b> Tupper con papel de cocina, 3-4 días sin que se pongan malas.</div><div class="prep-chk" style="visibility:hidden"></div></div>
+        <div class="prep-item"><div class="prep-ico">🫘</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Legumbres abiertas.</b> En tupper con agua fría, máximo 3 días.</div><div class="prep-chk" style="visibility:hidden"></div></div>
+      </div>
+    </div>
+    <button class="reset-btn" onclick="clearPrep()">↺ Reiniciar preparación</button>`;
+
+  document.getElementById('vprep').innerHTML = html;
+}
+
+function ckPrep(pd, i) {
+  const key = `${pd}_${i}`;
+  prepCk[key] = !prepCk[key];
+  localStorage.setItem('mesa_prep', JSON.stringify(prepCk));
+  renderPrep();
+}
+function clearPrep() {
+  prepCk = {};
+  localStorage.setItem('mesa_prep', '{}');
+  renderPrep();
+}
+
+/* ════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════ */
+function goTab(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+  document.getElementById('v' + name).classList.add('on');
+  btn.classList.add('on');
+  if (name === 'semana') renderSemana();
+  if (name === 'compra') renderCompra();
+  if (name === 'prep')   renderPrep();
+  if (name === 'hoy')    { renderHoy(); buildStrip(); }
+}
+
+/* touch-to-close sheet swipe */
+let sheetStartY = 0;
+const sheet = document.getElementById('sheet');
+sheet.addEventListener('touchstart', e => { sheetStartY = e.touches[0].clientY; }, {passive:true});
+sheet.addEventListener('touchend',   e => {
+  const dy = e.changedTouches[0].clientY - sheetStartY;
+  if (dy > 60) closeSheet();
+}, {passive:true});
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+buildStrip();
+renderHoy();
+
+setInterval(() => {
+  const v = document.querySelector('.view.on');
+  if (v && v.id === 'vhoy') renderHoy();
+}, 60000);
+</script>
+</body>
+</html>
