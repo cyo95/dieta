@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Mesa · Tu semana</title>
+<meta name="apple-mobile-web-app-title" content="CyoTools Dieta">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='112' fill='%230d0f0e'/%3E%3Crect width='512' height='512' rx='112' fill='url(%23g)'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23161a15'/%3E%3Cstop offset='1' stop-color='%230d0f0e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='256' cy='210' r='88' fill='none' stroke='%23e8845a' stroke-width='22'/%3E%3Cline x1='256' y1='122' x2='256' y2='78' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Cline x1='256' y1='298' x2='256' y2='348' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Cline x1='256' y1='348' x2='210' y2='420' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Cline x1='256' y1='348' x2='302' y2='420' stroke='%23e8845a' stroke-width='22' stroke-linecap='round'/%3E%3Ccircle cx='256' cy='210' r='30' fill='%23e8845a'/%3E%3Ctext x='256' y='480' text-anchor='middle' font-family='system-ui,sans-serif' font-size='52' font-weight='800' fill='%23f0ead8' opacity='0.5'%3ECyoTools%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d0f0e'/%3E%3Ccircle cx='16' cy='13' r='6' fill='none' stroke='%23e8845a' stroke-width='1.6'/%3E%3Cline x1='16' y1='7' x2='16' y2='4' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cline x1='16' y1='19' x2='16' y2='22' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cline x1='16' y1='22' x2='13' y2='27' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Cline x1='16' y1='22' x2='19' y2='27' stroke='%23e8845a' stroke-width='1.6' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='13' r='2.2' fill='%23e8845a'/%3E%3C/svg%3E">
+<title>CyoTools · Dieta semanal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -78,7 +81,7 @@ input  { font-family: inherit; }
 }
 .logo {
   font-family: 'DM Serif Display', serif;
-  font-size: 22px; color: var(--cream);
+  font-size: 17px; color: var(--cream);
   letter-spacing: -.3px;
 }
 .logo span { color: var(--copper); }
@@ -608,7 +611,7 @@ input  { font-family: inherit; }
   <!-- HEADER -->
   <header class="hdr">
     <div class="hdr-top">
-      <div class="logo">me<span>·</span>sa</div>
+      <a href="https://CyoTools.com/dieta" class="logo" style="text-decoration:none">CyoTools<span>.com/dieta</span></a>
       <div class="hdr-right">
         <div class="clock-pill" id="clock">00:00</div>
       </div>
@@ -652,80 +655,19 @@ input  { font-family: inherit; }
 const DAYS_L  = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const DAYS_S  = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-/* ─── BREAKFASTS ─────────────────────────── */
+/* ─── BREAKFASTS — rápidos, sin cocinar ─── */
 const BFASTS = [
   {
-    id:'A', label:'Yogur, granola y fruta',
-    tagline:'Rápido y saciante. Montas el bol en 2 minutos.',
-    ingredients:[
-      {n:'Yogur griego proteico', q:'200 g'},
-      {n:'Granola sin azúcar', q:'40 g'},
-      {n:'Frutos rojos o plátano', q:'1 puñado'},
-      {n:'Miel (opcional)', q:'1 cdta'},
-    ],
-    steps:[
-      {t:'Base',d:'Vierte el yogur en un bol amplio.'},
-      {t:'Encima',d:'Reparte la granola para que quede crujiente.'},
-      {t:'Fruta',d:'Añade los frutos rojos o el plátano en rodajas. Un hilo de miel si quieres dulzor extra.'},
-    ],
-    chips:[{t:'~25 g prot',cls:'prot'},{t:'~380 kcal',cls:'kcal'},{t:'2 min',cls:'time'}],
-    prepNote: null,
+    id:'🍌', label:'Llevas algo de casa',
+    sub:'Plátano · Manzana · Puñado de nueces · Barrita',
+    detail:'Lo preparas en 30 segundos la noche anterior. Lo comes de camino o al llegar.',
+    chips:[{t:'~10-15 min prep',cls:'time'},{t:'Sin cocinar',cls:'easy'}],
   },
   {
-    id:'B', label:'Pan integral, aguacate y huevo',
-    tagline:'Grasas buenas, proteína y fibra. Lo mejor para aguantar la mañana.',
-    ingredients:[
-      {n:'Pan integral tostado', q:'2 rebanadas'},
-      {n:'Aguacate maduro', q:'½ ud'},
-      {n:'Huevo', q:'1 ud'},
-      {n:'Sal en escamas + limón', q:'al gusto'},
-      {n:'Chile en copos (opcional)', q:'pizca'},
-    ],
-    steps:[
-      {t:'Tuesta el pan',d:'2-3 min en tostadora.'},
-      {t:'Aguacate',d:'Chafa el aguacate con un tenedor, sal y unas gotas de limón.'},
-      {t:'Huevo',d:'Fríe 1 huevo en sartén con AOVE a fuego medio-bajo, 3 min. La yema tiene que quedar un poco líquida.'},
-      {t:'Monta',d:'Aguacate encima del pan, huevo encima del aguacate. Chile en copos si quieres.'},
-    ],
-    chips:[{t:'~22 g prot',cls:'prot'},{t:'~420 kcal',cls:'kcal'},{t:'8 min',cls:'time'}],
-    prepNote: null,
-  },
-  {
-    id:'C', label:'Tortilla de claras con espinacas',
-    tagline:'Alta proteína, muy poca grasa. Ideal antes de entrenar.',
-    ingredients:[
-      {n:'Claras de huevo', q:'4 ud'},
-      {n:'Huevo entero', q:'1 ud'},
-      {n:'Espinacas baby', q:'un puñado'},
-      {n:'Queso fresco batido', q:'2 cdas'},
-      {n:'Sal y pimienta', q:'al gusto'},
-    ],
-    steps:[
-      {t:'Bate',d:'4 claras + 1 huevo entero con sal y pimienta.'},
-      {t:'Espinacas',d:'Saltea las espinacas 1 min en sartén con AOVE.'},
-      {t:'Tortilla',d:'Añade el batido de huevos. Fuego medio. Cuaja 3-4 min.'},
-      {t:'Sirve',d:'Con una cucharada de queso fresco batido encima.'},
-    ],
-    chips:[{t:'~30 g prot',cls:'prot'},{t:'~280 kcal',cls:'kcal'},{t:'8 min',cls:'time'}],
-    prepNote: null,
-  },
-  {
-    id:'D', label:'Avena proteica con canela',
-    tagline:'Energía lenta para toda la mañana. Ponla a calentar mientras te duchas.',
-    ingredients:[
-      {n:'Avena en copos', q:'60 g'},
-      {n:'Leche semidesnatada', q:'200 ml'},
-      {n:'Proteína en polvo o yogur', q:'1 cacito / 150 g'},
-      {n:'Plátano', q:'½ ud'},
-      {n:'Canela molida', q:'½ cdta'},
-    ],
-    steps:[
-      {t:'Cuece',d:'Avena + leche en un cazo 3-4 min a fuego medio, removiendo.'},
-      {t:'Proteína',d:'Fuera del fuego, añade el yogur griego o la proteína y mezcla bien.'},
-      {t:'Sirve',d:'En bol, plátano en rodajas encima, canela y listo.'},
-    ],
-    chips:[{t:'~28 g prot',cls:'prot'},{t:'~380 kcal',cls:'kcal'},{t:'5 min',cls:'time'}],
-    prepNote: null,
+    id:'🥛', label:'Yogur en el momento',
+    sub:'Yogur griego proteico · Frutos rojos · Un puñado de granola',
+    detail:'Si tienes 2 minutos en casa antes de salir. Metes el yogur en un tupper y te lo llevas.',
+    chips:[{t:'~20 g prot',cls:'prot'},{t:'2 min',cls:'time'}],
   },
 ];
 
@@ -734,13 +676,13 @@ const MENU = {
   1: { /* LUNES */
     comida: {
       name:'Solomillo de pollo al curry con arroz basmati',
-      tagline:'Especiado, aromático y saciante. El curry en polvo hace todo el trabajo.',
-      mins:22, prot:55, kcal:590,
+      tagline:'Especiado, aromático y muy saciante. El curry hace todo el trabajo de sabor.',
+      mins:22, prot:62, kcal:660,
       icon:'🍛',
       prepNote:'El arroz puede estar precocido del domingo. Solo caliéntalo 2 min al micro.',
       ingredients:[
-        {n:'Pechuga de pollo (tiras)', q:'400 g'},
-        {n:'Arroz basmati', q:'160 g'},
+        {n:'Pechuga de pollo (tiras)', q:'500 g'},
+        {n:'Arroz basmati', q:'180 g'},
         {n:'Cebolla', q:'1 ud'},
         {n:'Ajo', q:'2 dientes'},
         {n:'Curry en polvo', q:'1½ cdta'},
@@ -761,16 +703,16 @@ const MENU = {
     },
     cena: {
       name:'Ensalada de pollo a la plancha con mango y almendras',
-      tagline:'Cena ligera pero con proteína de verdad. El mango la hace especial.',
-      mins:12, prot:38, kcal:380,
+      tagline:'Cena que aguanta sola. Proteína alta, grasas buenas, y el mango lo hace especial.',
+      mins:12, prot:46, kcal:440,
       icon:'🥗',
       prepNote: null,
       ingredients:[
-        {n:'Pechuga de pollo', q:'280 g'},
+        {n:'Pechuga de pollo', q:'360 g'},
         {n:'Mix de hojas verdes', q:'1 bolsa'},
         {n:'Mango o melocotón', q:'½ ud'},
-        {n:'Almendras laminadas', q:'20 g'},
-        {n:'Tomate cherry', q:'8 ud'},
+        {n:'Almendras laminadas', q:'30 g'},
+        {n:'Tomate cherry', q:'10 ud'},
         {n:'Vinagre balsámico + AOVE', q:'al gusto'},
       ],
       steps:[
@@ -785,11 +727,11 @@ const MENU = {
     comida: {
       name:'Contramuslos de pollo en salsa de tomate y aceitunas',
       tagline:'Plato de cazuela sin complicación. Resultado de restaurante en 25 min.',
-      mins:28, prot:52, kcal:580,
+      mins:28, prot:60, kcal:640,
       icon:'🫕',
       prepNote: null,
       ingredients:[
-        {n:'Contramuslos de pollo (sin piel)', q:'600 g'},
+        {n:'Contramuslos de pollo (sin piel)', q:'700 g'},
         {n:'Tomate triturado', q:'400 ml'},
         {n:'Aceitunas verdes sin hueso', q:'50 g'},
         {n:'Cebolla', q:'1 ud'},
@@ -809,13 +751,13 @@ const MENU = {
     },
     cena: {
       name:'Huevos a la flamenca con chorizo',
-      tagline:'Cena contundente hecha en una sola sartén. Clásico reinventado.',
-      mins:15, prot:32, kcal:420,
+      tagline:'Cena contundente en una sola sartén. Proteína alta sin esfuerzo.',
+      mins:15, prot:38, kcal:460,
       icon:'🍳',
       prepNote: null,
       ingredients:[
-        {n:'Huevos', q:'4 ud'},
-        {n:'Chorizo en rodajas', q:'60 g'},
+        {n:'Huevos', q:'5 ud'},
+        {n:'Chorizo en rodajas', q:'80 g'},
         {n:'Tomate triturado', q:'200 ml'},
         {n:'Pimiento rojo asado (del bote)', q:'2 tiras'},
         {n:'Cebolla', q:'½ ud'},
@@ -835,12 +777,12 @@ const MENU = {
     comida: {
       name:'Pasta rigatoni con ragú de ternera y parmesano',
       tagline:'Una salsa de verdad, no de bote. 20 minutos y parece que llevas horas.',
-      mins:30, prot:54, kcal:620,
+      mins:30, prot:62, kcal:680,
       icon:'🍝',
       prepNote: null,
       ingredients:[
-        {n:'Rigatoni o penne (integral)', q:'200 g'},
-        {n:'Carne picada de ternera', q:'350 g'},
+        {n:'Rigatoni o penne (integral)', q:'220 g'},
+        {n:'Carne picada de ternera', q:'400 g'},
         {n:'Cebolla', q:'1 ud'},
         {n:'Zanahoria pequeña', q:'1 ud'},
         {n:'Ajo', q:'2 dientes'},
@@ -859,26 +801,26 @@ const MENU = {
       ],
     },
     cena: {
-      name:'Bol de quinoa, garbanzos y verduras asadas',
-      tagline:'Cena que parece de restaurante saludable. Sin cocinar proteína porque la quinoa y los garbanzos la aportan.',
-      mins:20, prot:28, kcal:420,
+      name:'Bol de arroz con garbanzos y verduras asadas',
+      tagline:'Cena que parece de restaurante saludable. Sin cocinar proteína porque los garbanzos la aportan.',
+      mins:15, prot:34, kcal:460,
       icon:'🥙',
-      prepNote:'Si preparas la quinoa el domingo junto al arroz, esta cena se monta en 5 minutos.',
+      prepNote:'Si tienes arroz precocinado del domingo, esta cena se monta en 5 minutos.',
       ingredients:[
-        {n:'Quinoa', q:'120 g'},
+        {n:'Arroz cocido (del domingo)', q:'200 g'},
         {n:'Garbanzos cocidos (bote)', q:'½ bote'},
         {n:'Pimiento rojo y amarillo', q:'1 de cada'},
         {n:'Cebolla morada', q:'½ ud'},
         {n:'Pepino', q:'½ ud'},
-        {n:'Tahini o yogur griego', q:'2 cdas'},
+        {n:'Yogur griego o tahini', q:'2 cdas'},
         {n:'Limón + AOVE + comino', q:'al gusto'},
       ],
       steps:[
-        {t:'Quinoa',d:'Cuece en agua con sal (1 parte quinoa, 2 de agua), 12-15 min. Deja reposar.'},
+        {t:'Arroz',d:'Calienta el arroz del domingo 2 min al micro con un chorrito de agua. Si no tienes, cuece 160 g en 12 min.'},
         {t:'Verduras',d:'Pimiento en tiras con AOVE en sartén, 7 min. Añade los garbanzos los últimos 2 min.'},
         {t:'Frescas',d:'Pepino y cebolla morada en dados pequeños.'},
-        {t:'Salsa',d:'Mezcla el tahini con zumo de limón, sal y un chorrito de agua hasta que emulsione.'},
-        {t:'Monta el bol',d:'Quinoa de base, verduras encima, crudas por encima. Salsa de tahini.'},
+        {t:'Salsa',d:'Mezcla el yogur griego con zumo de limón, sal y comino. O usa tahini si tienes.'},
+        {t:'Monta el bol',d:'Arroz de base, verduras y garbanzos encima, crudas por encima. Salsa por encima.'},
       ],
     },
   },
@@ -886,11 +828,11 @@ const MENU = {
     comida: {
       name:'Solomillo de pavo a la mostaza con boniato al horno',
       tagline:'Pavo jugoso con costra de mostaza y miel. El boniato hace el trabajo en el horno.',
-      mins:30, prot:58, kcal:560,
+      mins:30, prot:65, kcal:610,
       icon:'🍖',
       prepNote: null,
       ingredients:[
-        {n:'Solomillo de pavo', q:'500 g'},
+        {n:'Solomillo de pavo', q:'600 g'},
         {n:'Boniato', q:'2 medianos'},
         {n:'Mostaza de Dijon', q:'2 cdas'},
         {n:'Miel', q:'1 cda'},
@@ -910,7 +852,7 @@ const MENU = {
     cena: {
       name:'Lentejas rojas con leche de coco y cúrcuma',
       tagline:'No son las lentejas de siempre. Cremosas, especiadas y listas en 18 minutos.',
-      mins:18, prot:30, kcal:440,
+      mins:18, prot:36, kcal:480,
       icon:'🫘',
       prepNote: null,
       ingredients:[
@@ -936,11 +878,11 @@ const MENU = {
     comida: {
       name:'Hamburguesas caseras de ternera con patatas al horno',
       tagline:'Viernes = darte el gusto sin salirte. Hecho en casa y sin aceite frito.',
-      mins:30, prot:58, kcal:640,
+      mins:30, prot:66, kcal:700,
       icon:'🍔',
       prepNote: null,
       ingredients:[
-        {n:'Carne picada de ternera', q:'400 g'},
+        {n:'Carne picada de ternera', q:'500 g'},
         {n:'Patatas medianas', q:'4 ud'},
         {n:'Pan de hamburguesa integral', q:'2 ud'},
         {n:'Lechuga + tomate + cebolla', q:'al gusto'},
@@ -958,26 +900,28 @@ const MENU = {
       ],
     },
     cena: {
-      name:'Crema de puerro y patata con jamón crujiente',
-      tagline:'La crema más fácil del mundo. El jamón crujiente la eleva a otro nivel.',
-      mins:20, prot:22, kcal:340,
-      icon:'🍲',
-      prepNote: null,
+      name:'Arroz frito con pollo, huevo y soja',
+      tagline:'El clásico del takeaway hecho en casa en 12 minutos. Mucho mejor y sin aceite de más.',
+      mins:12, prot:44, kcal:520,
+      icon:'🍳',
+      prepNote:'Funciona mejor con arroz del día anterior o del domingo — más seco y se fríe mejor.',
       ingredients:[
-        {n:'Puerros', q:'2 ud'},
-        {n:'Patata mediana', q:'2 ud'},
-        {n:'Caldo de verduras o pollo', q:'600 ml'},
-        {n:'Jamón serrano en lonchas', q:'3 ud'},
-        {n:'Nata para cocinar (opcional)', q:'50 ml'},
-        {n:'Nuez moscada + sal + pimienta', q:'al gusto'},
-        {n:'AOVE', q:'1 cda'},
+        {n:'Arroz basmati cocido (frío)', q:'300 g'},
+        {n:'Pechuga de pollo en dados', q:'300 g'},
+        {n:'Huevos', q:'3 ud'},
+        {n:'Cebolleta o cebolla', q:'1 ud'},
+        {n:'Ajo', q:'2 dientes'},
+        {n:'Salsa de soja', q:'3 cdas'},
+        {n:'Aceite de sésamo (o AOVE)', q:'1 cda'},
+        {n:'Zanahoria rallada (opcional)', q:'½ ud'},
+        {n:'Sal + pimienta', q:'al gusto'},
       ],
       steps:[
-        {t:'Sofrito',d:'Puerros en rodajas en AOVE, 5 min a fuego medio.'},
-        {t:'Patata',d:'Añade la patata pelada en dados + caldo. Hierve 12-15 min hasta que esté blanda.'},
-        {t:'Tritura',d:'Tritura con batidora hasta que quede muy suave. Añade la nata si quieres. Salpimenta.'},
-        {t:'Jamón crujiente',d:'En sartén sin aceite, jamón 2 min por lado hasta que quede crujiente. Rompe en trozos.'},
-        {t:'Sirve',d:'Crema en bol, jamón crujiente por encima. Un hilo de AOVE.'},
+        {t:'Pollo',d:'Dados de pollo con sal y pimienta en sartén grande o wok a fuego fuerte con AOVE. 5-6 min. Reserva.'},
+        {t:'Aromáticos',d:'En la misma sartén, ajo y cebolleta picados 1 min.'},
+        {t:'Arroz',d:'Añade el arroz frío, sube el fuego al máximo. Remueve con espátula 3 min hasta que empiece a crujir.'},
+        {t:'Huevos',d:'Haz hueco en el centro, casca los 3 huevos y revuelve rápido hasta que cuajen y se mezclen con el arroz.'},
+        {t:'Finaliza',d:'Devuelve el pollo, añade la soja y el aceite de sésamo. 1 min removiendo. Sirve inmediatamente.'},
       ],
     },
   },
@@ -985,7 +929,7 @@ const MENU = {
     comida: {
       name:'Pechuga rellena de mozzarella y tomate seco al horno',
       tagline:'Parece complicado y no lo es. El horno hace el trabajo.',
-      mins:30, prot:62, kcal:560,
+      mins:30, prot:70, kcal:620,
       icon:'🧀',
       prepNote: null,
       ingredients:[
@@ -1009,13 +953,13 @@ const MENU = {
     cena: {
       name:'Revuelto de champiñones, gamba y ajo',
       tagline:'Sábado noche sin esfuerzo. En 10 minutos tienes una cena de 10.',
-      mins:10, prot:34, kcal:320,
+      mins:10, prot:40, kcal:360,
       icon:'🍤',
       prepNote: null,
       ingredients:[
-        {n:'Champiñones laminados', q:'250 g'},
-        {n:'Gambas peladas congeladas', q:'200 g'},
-        {n:'Huevos', q:'4 ud'},
+        {n:'Champiñones laminados', q:'300 g'},
+        {n:'Gambas peladas congeladas', q:'250 g'},
+        {n:'Huevos', q:'5 ud'},
         {n:'Ajo', q:'3 dientes'},
         {n:'Perejil fresco o seco', q:'al gusto'},
         {n:'Guindilla (opcional)', q:'pizca'},
@@ -1035,7 +979,7 @@ const MENU = {
     comida: {
       name:'Pollo asado al limón con patatas y cebolla',
       tagline:'El clásico dominical. El olor solo ya justifica el rato en casa.',
-      mins:50, prot:60, kcal:600,
+      mins:50, prot:68, kcal:660,
       icon:'🍗',
       prepNote:'Haz el doble de pollo y guarda la mitad para ensaladas del lunes y martes. 10 minutos extra, 3 días de proteína lista.',
       ingredients:[
@@ -1058,25 +1002,27 @@ const MENU = {
       ],
     },
     cena: {
-      name:'Tortilla española de la abuela',
-      tagline:'Con lo que queda de semana. La tortilla perfecta es la que no tiene prisa.',
-      mins:25, prot:28, kcal:420,
-      icon:'🥚',
-      prepNote:'Es el momento de usar los huevos que queden de la semana.',
+      name:'Pollo desmechado con pimientos y arroz',
+      tagline:'Con el pollo sobrante del asado de hoy. Sabor de fajita, listo en 10 minutos.',
+      mins:10, prot:48, kcal:520,
+      icon:'🫕',
+      prepNote:'Aprovecha el pollo del asado del mediodía. Solo desmecha y saltea. Cena de domingo sin esfuerzo real.',
       ingredients:[
-        {n:'Huevos', q:'6 ud'},
-        {n:'Patatas', q:'3 medianas'},
+        {n:'Pollo asado sobrante (desmechado)', q:'350 g'},
+        {n:'Arroz cocido', q:'200 g'},
+        {n:'Pimiento rojo', q:'1 ud'},
+        {n:'Pimiento verde', q:'1 ud'},
         {n:'Cebolla', q:'1 ud'},
-        {n:'AOVE', q:'200 ml (para confitar)'},
-        {n:'Sal', q:'generosa'},
+        {n:'Ajo', q:'2 dientes'},
+        {n:'Pimentón ahumado + comino', q:'1 cdta cada uno'},
+        {n:'AOVE + sal', q:'al gusto'},
       ],
       steps:[
-        {t:'Confitar',d:'Patata en rodajas finas + cebolla en juliana + sal en sartén honda con AOVE. Fuego bajo-medio 18-20 min. No tienen que freírse, sino ablandarse. Remueve de vez en cuando.'},
-        {t:'Escurre',d:'Cuela las patatas y reserva el aceite (guárdalo, sirve para todo).'},
-        {t:'Huevos',d:'Bate los 6 huevos con sal. Mezcla las patatas con los huevos. Deja reposar 2 min.'},
-        {t:'Primera cara',d:'En sartén antiadherente con 2 cdas del aceite reservado a fuego medio. Vierte la mezcla. 4-5 min tapada hasta que los bordes cuajen pero el centro esté cremoso.'},
-        {t:'Voltear',d:'El momento clave: plato encima, volteo rápido, desliza la tortilla de vuelta. 2-3 min más.'},
-        {t:'Sirve',d:'Ligeramente jugosa en el centro. Con pan y una ensalada verde.'},
+        {t:'Verduras',d:'Pimientos y cebolla en juliana en sartén con AOVE a fuego fuerte. 6-7 min hasta que cojan color.'},
+        {t:'Ajo y especias',d:'Añade el ajo laminado + pimentón + comino. 1 min más.'},
+        {t:'Pollo',d:'Incorpora el pollo desmechado. Mezcla bien, 2 min para que se caliente y coja los sabores.'},
+        {t:'Arroz',d:'Añade el arroz frío, remueve fuerte 2 min hasta que todo esté integrado y caliente.'},
+        {t:'Sirve',d:'Solo o con unas gotas de limón por encima. Aguanta perfectamente en tupper para el lunes.'},
       ],
     },
   },
@@ -1094,12 +1040,11 @@ const SHOP = {
     {n:'Jamón serrano en lonchas', q:'100 g'},
   ],
   '🥚 Huevos y lácteos': [
-    {n:'Huevos L', q:'18 ud'},
-    {n:'Mozzarella fresca', q:'2 bolas'},
-    {n:'Yogur griego proteico', q:'1 kg'},
-    {n:'Queso fresco batido', q:'500 g'},
-    {n:'Nata para cocinar', q:'200 ml'},
-    {n:'Leche semidesnatada', q:'1 L'},
+    {n:'Huevos L', q:'16 ud', uso:'comidas'},
+    {n:'Mozzarella fresca', q:'2 bolas', uso:'comidas'},
+    {n:'Yogur griego proteico', q:'1 kg', uso:'desayuno opcional'},
+    {n:'Queso fresco batido', q:'500 g', uso:'comidas + desayuno'},
+    {n:'Leche semidesnatada', q:'1 L', uso:'desayuno opcional'},
   ],
   '🫘 Legumbres y conservas': [
     {n:'Garbanzos cocidos (botes)', q:'2 ud'},
@@ -1111,53 +1056,53 @@ const SHOP = {
     {n:'Gambas peladas congeladas', q:'200 g'},
   ],
   '🥦 Verduras': [
-    {n:'Cebollas', q:'5 ud'},
-    {n:'Cebolla morada', q:'1 ud'},
-    {n:'Ajo (cabezas)', q:'2 ud'},
-    {n:'Puerros', q:'2 ud'},
-    {n:'Pimiento rojo', q:'3 ud'},
-    {n:'Pimiento amarillo', q:'1 ud'},
-    {n:'Champiñones', q:'250 g'},
-    {n:'Zanahoria', q:'3 ud'},
-    {n:'Espinacas baby (bolsas)', q:'2 ud'},
-    {n:'Mix hojas verdes (bolsas)', q:'2 ud'},
-    {n:'Pepino', q:'1 ud'},
-    {n:'Tomates cherry', q:'1 bandeja'},
-    {n:'Tomates maduros', q:'500 g'},
+    {n:'Cebollas', q:'5 ud', uso:'comidas'},
+    {n:'Cebolla morada', q:'1 ud', uso:'comidas'},
+    {n:'Cebolleta', q:'2 ud', uso:'comidas'},
+    {n:'Ajo (cabezas)', q:'2 ud', uso:'comidas'},
+    {n:'Pimiento rojo', q:'4 ud', uso:'comidas'},
+    {n:'Pimiento verde', q:'2 ud', uso:'comidas'},
+    {n:'Pimiento amarillo', q:'1 ud', uso:'comidas'},
+    {n:'Champiñones', q:'300 g', uso:'comidas'},
+    {n:'Zanahoria', q:'3 ud', uso:'comidas'},
+    {n:'Espinacas baby (bolsas)', q:'2 ud', uso:'comidas'},
+    {n:'Mix hojas verdes (bolsas)', q:'2 ud', uso:'comidas'},
+    {n:'Pepino', q:'1 ud', uso:'comidas'},
+    {n:'Tomates cherry', q:'1 bandeja', uso:'comidas'},
+    {n:'Tomates maduros', q:'500 g', uso:'comidas'},
   ],
   '🍎 Fruta': [
-    {n:'Plátanos', q:'6 ud'},
-    {n:'Manzanas', q:'5 ud'},
-    {n:'Limones', q:'4 ud'},
-    {n:'Aguacates', q:'3 ud'},
-    {n:'Mango o melocotón (según temporada)', q:'1 ud'},
-    {n:'Frutos rojos (bandeja)', q:'1 ud'},
+    {n:'Plátanos', q:'6 ud', uso:'desayuno / snack'},
+    {n:'Manzanas', q:'5 ud', uso:'desayuno / snack'},
+    {n:'Limones', q:'4 ud', uso:'comidas'},
+    {n:'Aguacates', q:'3 ud', uso:'comidas'},
+    {n:'Mango o melocotón (según temporada)', q:'1 ud', uso:'comidas'},
+    {n:'Frutos rojos (bandeja)', q:'1 ud', uso:'desayuno opcional'},
   ],
   '🌾 Hidratos': [
-    {n:'Arroz basmati', q:'1 kg'},
-    {n:'Quinoa', q:'500 g'},
-    {n:'Pasta integral (rigatoni/penne)', q:'500 g'},
-    {n:'Patatas', q:'2 kg'},
-    {n:'Boniato', q:'2 ud'},
-    {n:'Pan integral de molde', q:'1 ud'},
-    {n:'Pan de hamburguesa integral', q:'4 ud'},
-    {n:'Avena en copos', q:'500 g'},
-    {n:'Granola sin azúcar', q:'300 g'},
+    {n:'Arroz basmati', q:'1 kg', uso:'comidas'},
+    {n:'Pasta integral (rigatoni/penne)', q:'500 g', uso:'comidas'},
+    {n:'Patatas', q:'2 kg', uso:'comidas'},
+    {n:'Boniato', q:'2 ud', uso:'comidas'},
+    {n:'Pan integral de molde', q:'1 ud', uso:'comidas + desayuno'},
+    {n:'Pan de hamburguesa integral', q:'4 ud', uso:'comidas'},
+    {n:'Avena en copos', q:'500 g', uso:'desayuno opcional'},
+    {n:'Granola sin azúcar', q:'300 g', uso:'desayuno opcional'},
   ],
   '🫒 Despensa': [
-    {n:'Aceite de oliva virgen extra', q:'1 botella'},
-    {n:'Curry en polvo', q:'1 bote'},
-    {n:'Cúrcuma', q:'1 bote'},
-    {n:'Comino molido', q:'1 bote'},
-    {n:'Pimentón ahumado', q:'1 bote'},
-    {n:'Orégano seco', q:'1 bote'},
-    {n:'Mostaza de Dijon', q:'1 bote'},
-    {n:'Miel', q:'1 bote'},
-    {n:'Tahini (opcional)', q:'1 bote'},
-    {n:'Almendras laminadas', q:'100 g'},
-    {n:'Caldo de pollo (brick)', q:'1 ud'},
-    {n:'Caldo de verduras (brick)', q:'1 ud'},
-    {n:'Vino blanco para cocinar', q:'1 brick'},
+    {n:'Aceite de oliva virgen extra', q:'1 botella', uso:'comidas'},
+    {n:'Salsa de soja', q:'1 botella', uso:'comidas'},
+    {n:'Aceite de sésamo (opcional)', q:'1 botella', uso:'comidas'},
+    {n:'Curry en polvo', q:'1 bote', uso:'comidas'},
+    {n:'Cúrcuma', q:'1 bote', uso:'comidas'},
+    {n:'Comino molido', q:'1 bote', uso:'comidas'},
+    {n:'Pimentón ahumado', q:'1 bote', uso:'comidas'},
+    {n:'Orégano seco', q:'1 bote', uso:'comidas'},
+    {n:'Mostaza de Dijon', q:'1 bote', uso:'comidas'},
+    {n:'Miel', q:'1 bote', uso:'comidas'},
+    {n:'Almendras laminadas', q:'100 g', uso:'comidas'},
+    {n:'Caldo de pollo (brick)', q:'1 ud', uso:'comidas'},
+    {n:'Vino blanco para cocinar', q:'1 brick', uso:'comidas'},
   ],
 };
 
@@ -1168,7 +1113,6 @@ const PREP_DAYS = [
     meta: 'Hazlo una vez, come bien los 7 días',
     items: [
       {ico:'🍚', txt:'Cocer 600 g de arroz basmati. Dividir en 3 tuppers y refrigerar.'},
-      {ico:'🌾', txt:'Cocer 300 g de quinoa. Guardar en tupper, aguanta 5 días.'},
       {ico:'🥚', txt:'Cocer 6 huevos duros. Guardar sin pelar en nevera.'},
       {ico:'🧄', txt:'Pelar y laminar 2 cabezas de ajo enteras. En tupper hermético.'},
       {ico:'🥗', txt:'Lavar y centrifugar las bolsas de hojas. Tupper con papel de cocina.'},
@@ -1420,15 +1364,24 @@ function renderHoy() {
     });
   }
 
-  /* desayunos */
-  const bfastsHTML = `<div class="sec-head">Elige tu desayuno</div>
+  /* desayunos — simplificados, sin sheet */
+  const bfastsHTML = `<div class="sec-head">Desayuno rápido</div>
+  <div class="info-banner" style="margin-bottom:10px;border-color:rgba(212,168,67,.2);background:rgba(212,168,67,.05)">
+    <div class="ib-icon">⚡</div>
+    <div class="ib-body">
+      <div class="ib-title">Sin prisa por la mañana</div>
+      <div class="ib-text">Las comidas de hoy ya están pensadas para compensar. Coge algo rápido y ve.</div>
+    </div>
+  </div>
   <div class="bf-grid">
     ${BFASTS.map(b => `
-    <div class="bf-card" onclick="openSheet(recipeSheetHTML(BFASTS[${BFASTS.indexOf(b)}],'desay'))">
-      <div class="bf-letter">${b.id}</div>
+    <div class="bf-card" style="cursor:default">
+      <div class="bf-letter" style="font-size:20px">${b.id}</div>
       <div>
         <div class="bf-name">${b.label}</div>
-        <div class="bf-items">${b.items}</div>
+        <div class="bf-items">${b.sub}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:5px">${b.detail}</div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:7px">${b.chips.map(c=>`<span class="chip ${c.cls}">${c.t}</span>`).join('')}</div>
       </div>
     </div>`).join('')}
   </div>`;
@@ -1529,6 +1482,13 @@ function renderCompra() {
       <div class="shop-top-sub">Para 2 personas. Con margen por si os saltáis alguna comida.</div>
       <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%"></div></div>
       <div class="prog-label">${ckCount} de ${allItems.length} productos · ${pct}%</div>
+    </div>
+    <div class="info-banner" style="border-color:rgba(212,168,67,.2);background:rgba(212,168,67,.05);margin-bottom:6px">
+      <div class="ib-icon">💡</div>
+      <div class="ib-body">
+        <div class="ib-title">¿Qué comprar?</div>
+        <div class="ib-text">Los productos marcados <span style="background:rgba(212,168,67,.12);color:#d4a843;font-weight:700;padding:1px 5px;border-radius:4px;font-size:10px">desayuno opcional</span> son solo si quieres desayunar en casa. El resto es para comidas y cenas.</div>
+      </div>
     </div>`;
 
   let gi = 0;
@@ -1538,9 +1498,11 @@ function renderCompra() {
       <div class="shop-list">`;
     items.forEach(item => {
       const idx = gi;
+      const isOptional = item.uso && item.uso.includes('opcional');
+      const usoBadge = item.uso ? `<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;margin-left:4px;white-space:nowrap;${isOptional ? 'background:rgba(212,168,67,.1);color:#d4a843' : 'background:rgba(122,184,138,.08);color:#7ab88a'}">${item.uso}</span>` : '';
       html += `<div class="shop-item ${shopCk[idx] ? 'ck' : ''}" onclick="ckShop(${idx})">
         <div class="s-check"><span class="s-check-mark">✓</span></div>
-        <span class="s-name">${item.n}</span>
+        <span class="s-name">${item.n}${usoBadge}</span>
         <span class="s-qty">${item.q}</span>
       </div>`;
       gi++;
@@ -1603,7 +1565,7 @@ function renderPrep() {
     <div class="sec-head">Conservación</div>
     <div class="prep-day">
       <div class="prep-items">
-        <div class="prep-item"><div class="prep-ico">🧊</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Arroz y quinoa cocidos.</b> Tupper hermético en nevera, 4-5 días. Al micro 2 min para calentar.</div><div class="prep-chk" style="visibility:hidden"></div></div>
+        <div class="prep-item"><div class="prep-ico">🧊</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Arroz cocido.</b> Tupper hermético en nevera, 4-5 días. Al micro 2 min para calentar.</div><div class="prep-chk" style="visibility:hidden"></div></div>
         <div class="prep-item"><div class="prep-ico">🥚</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Huevos duros.</b> Sin pelar en nevera, hasta 1 semana.</div><div class="prep-chk" style="visibility:hidden"></div></div>
         <div class="prep-item"><div class="prep-ico">🍗</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Pollo cocinado.</b> Tupper en nevera 3 días. Congela si es para más.</div><div class="prep-chk" style="visibility:hidden"></div></div>
         <div class="prep-item"><div class="prep-ico">🥗</div><div class="prep-txt" style="text-decoration:none"><b style="color:var(--cream)">Hojas lavadas.</b> Tupper con papel de cocina, 3-4 días sin que se pongan malas.</div><div class="prep-chk" style="visibility:hidden"></div></div>
