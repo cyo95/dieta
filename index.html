@@ -831,6 +831,7 @@ var pendingMode=currentMode;
 var selDay=new Date().getDay();
 var shopCk=JSON.parse(localStorage.getItem('mesa_shop')||'{}');
 var prepCk=JSON.parse(localStorage.getItem('mesa_prep')||'{}');
+var prepHoyCk=JSON.parse(localStorage.getItem('mesa_prep_hoy')||'{}');
 /* mealActive: objeto {dayIdx_tipo: true/false} — si false, ese plato se excluye de la compra */
 var mealActive=JSON.parse(localStorage.getItem('mesa_meals')||'{}');
 var currentDetailSteps=[];
@@ -1029,6 +1030,54 @@ function updateDetailProg(){
 }
 function closeDetail(){document.getElementById('detailOverlay').classList.remove('open');}
 
+/* ── PREP HOY — checkbox y detalle ── */
+function togglePrepHoy(dayIdx,idx){
+  var key=dayIdx+'_'+idx;
+  prepHoyCk[key]=!prepHoyCk[key];
+  localStorage.setItem('mesa_prep_hoy',JSON.stringify(prepHoyCk));
+  renderHoy();
+}
+function openPrepDetail(dayIdx,idx){
+  var tareas=PREP_HOY[dayIdx];
+  if(!tareas||!tareas[idx]) return;
+  var tarea=tareas[idx];
+  var pasos=tarea.pasos||[];
+  var lt=tarea.ico+' '+tarea.txt;
+  document.getElementById('detailHdrLabel').textContent='🔪 Prep';
+  document.getElementById('detailHdrLabel').style.color='var(--gold)';
+  document.getElementById('detailHdrName').textContent=tarea.txt;
+  document.getElementById('detailProgWrap').classList.remove('show');
+  document.getElementById('detailProgFill').style.width='0%';
+  document.getElementById('detailProgTxt').textContent='0 pasos completados';
+  document.getElementById('detailProgPct').textContent='0%';
+  var hero='<div class="detail-hero">'+
+    '<div class="detail-emoji">'+tarea.ico+'</div>'+
+    '<div class="detail-hero-title">'+tarea.txt+'</div>'+
+    (tarea.tiempo?'<div class="detail-hero-tagline">⏱ '+tarea.tiempo+'</div>':'')+
+    '<div class="detail-hero-chips"><span class="sh-chip easy">Prep del día</span></div>'+
+    '</div>';
+  var stepsHTML='<div class="detail-steps-wrap">';
+  for(var i=0;i<pasos.length;i++){
+    var p=pasos[i];
+    stepsHTML+='<div class="detail-step" id="dstep'+i+'">'+
+      '<div class="detail-step-left">'+
+        '<div class="detail-step-num" onclick="toggleStep('+i+')" id="dnum'+i+'">'+(i+1)+'</div>'+
+        '<div class="detail-step-line"></div>'+
+      '</div>'+
+      '<div class="detail-step-body">'+
+        '<div class="detail-step-title">'+p.t+'</div>'+
+        '<div class="detail-step-desc">'+p.d+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  stepsHTML+='</div>';
+  currentDetailSteps=pasos;
+  detailDone={};
+  document.getElementById('detailScroll').innerHTML=hero+stepsHTML;
+  document.getElementById('detailScroll').scrollTop=0;
+  document.getElementById('detailOverlay').classList.add('open');
+}
+
 /* swipe detail */
 var detailStartX=0;
 document.getElementById('detailOverlay').addEventListener('touchstart',function(e){detailStartX=e.touches[0].clientX;},{passive:true});
@@ -1043,21 +1092,88 @@ document.getElementById('sheetHandle').onclick=closeSheet;
 /* ── PREP POR DÍA (para aviso en Hoy) ── */
 var PREP_HOY={
   0:[ /* domingo */
-    {ico:'🍚',txt:'Cocer 500g de arroz basmati para toda la semana'},
-    {ico:'🥚',txt:'Cocer 4 huevos 6 min 30 seg exactos (huevos melosos para el ramen)'},
-    {ico:'🍅',txt:'Hacer pico de gallo grande (para martes, sábado y domingo)'},
-    {ico:'🥑',txt:'Hacer guacamole base y cubrir con film pegado'},
-    {ico:'🍗',txt:'Marinar el pollo de las quesadillas del lunes en nevera'},
-    {ico:'🐓',txt:'Meter los muslos de pollo en el horno junto a las costillas'}
+    {
+      ico:'🍚', txt:'Cocer arroz basmati para toda la semana', tiempo:'15 min',
+      pasos:[
+        {t:'Mide el arroz',d:'500g de arroz basmati en un bol. Acláralo bajo el grifo hasta que el agua salga casi transparente — esto quita el almidón sobrante y lo deja más suelto.'},
+        {t:'Cuece',d:'En cazo con 750ml de agua hirviendo con sal. Tapa y fuego bajo 12 minutos. No destapes mientras cuece.'},
+        {t:'Reposa',d:'Apaga el fuego y deja reposar tapado 5 minutos más. Luego abre y suelta con un tenedor.'},
+        {t:'Guarda',d:'Divide en 2-3 tuppers herméticos. Cuando enfríe del todo, a la nevera. Aguanta 4-5 días.'}
+      ]
+    },
+    {
+      ico:'🥚', txt:'Huevos melosos para el ramen del miércoles', tiempo:'10 min',
+      pasos:[
+        {t:'Agua hirviendo',d:'Pon agua a hervir en un cazo. Tiene que estar hirviendo fuerte antes de meter los huevos.'},
+        {t:'Mete los huevos',d:'Con una cuchara, baja los huevos al agua despacio para que no se rompan. Exactamente 6 minutos 30 segundos. Pon un temporizador, no lo calcules a ojo.'},
+        {t:'Agua con hielo',d:'Saca los huevos directamente a un bol con agua fría y hielo. Déjalos 2 minutos. Esto para la cocción y hace que se pelen fácil.'},
+        {t:'Pela y guarda',d:'Pélalos con cuidado — la clara es firme pero la yema está semi-líquida. Guarda en tupper seco en nevera. Máximo 2 días o la yema se endurece.'}
+      ]
+    },
+    {
+      ico:'🍅', txt:'Pico de gallo grande (para martes, sábado y domingo)', tiempo:'10 min',
+      pasos:[
+        {t:'Tomate',d:'3 tomates maduros en dados pequeños de 1 cm. Cuanto más pequeños, mejor textura. Desecha el jugo que suelte si hay mucho.'},
+        {t:'Cebolla y cilantro',d:'½ cebolla morada picada muy fina. Un buen puñado de cilantro (o perejil si no te gusta el cilantro) también muy picado.'},
+        {t:'Aliña',d:'Zumo de 1 lima, sal generosa. Mezcla todo. Prueba y ajusta de sal y lima.'},
+        {t:'Guarda',d:'Tupper en nevera. Aguanta 3-4 días. Con el tiempo el tomate suelta agua — es normal, solo escurre un poco antes de usar.'}
+      ]
+    },
+    {
+      ico:'🥑', txt:'Guacamole base (para lunes y miércoles)', tiempo:'5 min',
+      pasos:[
+        {t:'Abre los aguacates',d:'2 aguacates maduros. Tienen que ceder al presionar con el pulgar. Si están duros, no sirven todavía.'},
+        {t:'Aplasta',d:'Saca la carne a un bol y aplasta con un tenedor. Deja algún trozo — no tiene que quedar perfecto ni liso.'},
+        {t:'Aliña',d:'Zumo de 1 lima, sal. Mezcla. Prueba. Si tienes cebolla morada sobrante del pico de gallo, añade un poco picada fina.'},
+        {t:'Conserva',d:'IMPORTANTE: cubre con film transparente pegado directamente a la superficie del guacamole, sin aire entre el film y la crema. Así no se pone negro. Nevera máximo 2 días.'}
+      ]
+    },
+    {
+      ico:'🍗', txt:'Marinar el pollo para las quesadillas del lunes', tiempo:'5 min',
+      pasos:[
+        {t:'Corta el pollo',d:'300g de pechuga en tiras finas de 1 cm de grosor. Cuanto más fino, más rápido se cocina y más sabor coge.'},
+        {t:'Marina',d:'En el tupper donde lo vas a guardar: sal, cumin (½ cdta), pimentón ahumado (½ cdta), un chorrito de aceite. Mezcla bien para que cada tira quede cubierta.'},
+        {t:'Nevera',d:'Tapa y a la nevera. Mañana al cocinarlo estará mucho más sabroso que si lo haces en el momento. Aguanta perfectamente 2 días.'}
+      ]
+    },
+    {
+      ico:'🐓', txt:'Meter los muslos de pollo al horno con las costillas', tiempo:'2 min',
+      pasos:[
+        {t:'Sazona',d:'4 muslos de pollo sin piel. Sal y pimienta por todos lados.'},
+        {t:'Al horno',d:'Ponlos en la misma bandeja que las costillas o en una bandeja aparte. Entran al horno a la vez a 160°C.'},
+        {t:'Tiempo',d:'Se hacen en 1h 30min, igual que las costillas. No necesitas vigilarlos. Al sacarlos estarán jugosos y listos para desmechar esta noche para la cena.'}
+      ]
+    }
   ],
   1:[ /* lunes */
-    {ico:'❄️',txt:'Sacar las gambas del congelador al frigo (para viernes y sábado)'}
+    {
+      ico:'❄️', txt:'Sacar las gambas del congelador al frigo', tiempo:'1 min',
+      pasos:[
+        {t:'Sácalas ahora',d:'Saca la bolsa de gambas del congelador y ponla en la balda baja de la nevera.'},
+        {t:'Por qué ahora',d:'Las gambas necesitan descongelarse lentamente en frío para que no pierdan textura. Si las descongelas en agua caliente o en el micro quedan gomosas. Con 24h en nevera quedan perfectas.'},
+        {t:'Para cuándo',d:'Las usas el viernes para los espaguetis y el sábado para los tacos de gambas.'}
+      ]
+    }
   ],
   3:[ /* miércoles */
-    {ico:'🧊',txt:'Comprobar los huevos melosos en nevera para el ramen de hoy'}
+    {
+      ico:'🧊', txt:'Comprobar los huevos melosos para el ramen de hoy', tiempo:'2 min',
+      pasos:[
+        {t:'Comprueba',d:'Abre la nevera y busca el tupper con los huevos melosos del domingo. Si están, perfecto — úsalos esta noche para el ramen.'},
+        {t:'Si no quedan',d:'Cuece 2 huevos ahora: agua hirviendo, 6 minutos 30 segundos exactos, agua con hielo 2 minutos, pela. Listos para la cena.'},
+        {t:'Cómo saber si están bien',d:'Al partirlos por la mitad la clara tiene que estar completamente blanca y cuajada, y la yema semi-líquida y de color naranja intenso. Si la yema está completamente sólida, se pasaron de tiempo.'}
+      ]
+    }
   ],
   5:[ /* viernes */
-    {ico:'🥩',txt:'Saca el entrecot del frigo ahora — necesita 20 min a temperatura ambiente antes de cocinarlo'}
+    {
+      ico:'🥩', txt:'Sacar el entrecot del frigo ahora', tiempo:'1 min',
+      pasos:[
+        {t:'Sácalo ya',d:'El entrecot tiene que estar 20-30 minutos a temperatura ambiente antes de cocinarlo. Sácalo de la nevera ahora mismo y déjalo en un plato en la encimera.'},
+        {t:'Por qué importa',d:'La carne fría en sartén caliente baja la temperatura de golpe y no sella bien. Queda gris por fuera en vez de tener esa costra dorada. A temperatura ambiente sella en segundos.'},
+        {t:'Cuándo cocinarlo',d:'Cuando lleve 20-30 min fuera de la nevera. No más de 1 hora.'}
+      ]
+    }
   ]
 };
 
@@ -1124,26 +1240,47 @@ function renderHoy(){
   /* aviso de tareas de prep del día actual */
   var prepAlertHTML='';
   if(isToday&&PREP_HOY[selDay]&&PREP_HOY[selDay].length>0){
-    var tareas=PREP_HOY[selDay];var filas='';
+    var tareas=PREP_HOY[selDay];
+    var donePrepCount=0;
+    for(var pi=0;pi<tareas.length;pi++){if(prepHoyCk[selDay+'_'+pi]) donePrepCount++;}
+    var pct2=tareas.length>0?Math.round(donePrepCount/tareas.length*100):0;
+    var filas='';
     for(var pi=0;pi<tareas.length;pi++){
-      filas+='<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;'+(pi<tareas.length-1?'border-bottom:1px solid var(--line)':'')+'">'+
-        '<span style="font-size:16px;flex-shrink:0">'+tareas[pi].ico+'</span>'+
-        '<span style="font-size:13px;color:var(--cream);line-height:1.45">'+tareas[pi].txt+'</span>'+
-      '</div>';
+      var isDone=prepHoyCk[selDay+'_'+pi]?true:false;
+      var borderB=pi<tareas.length-1?'border-bottom:1px solid rgba(212,168,67,.15);':'';
+      var chkBg=isDone?'var(--sage)':'transparent';
+      var chkBorder=isDone?'var(--sage)':'rgba(212,168,67,.5)';
+      var txtColor=isDone?'var(--muted)':'var(--cream)';
+      var txtDeco=isDone?'text-decoration:line-through;':'';
+      var chkMark=isDone?'<span style="font-size:11px;color:#0d0f0e;font-weight:800;">✓</span>':'';
+      filas+=
+        '<div style="'+borderB+'padding:11px 0;">'+
+          '<div style="display:flex;align-items:flex-start;gap:10px;">'+
+            '<div onclick="togglePrepHoy('+selDay+','+pi+')" style="margin-top:2px;width:22px;height:22px;border-radius:50%;border:1.5px solid '+chkBorder+';background:'+chkBg+';flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;">'+chkMark+'</div>'+
+            '<span style="font-size:18px;flex-shrink:0;line-height:1.3;">'+tareas[pi].ico+'</span>'+
+            '<div style="flex:1;">'+
+              '<div style="font-size:13px;font-weight:600;color:'+txtColor+';line-height:1.4;'+txtDeco+'">'+tareas[pi].txt+'</div>'+
+              (tareas[pi].tiempo?'<div style="font-size:11px;color:var(--muted);margin-top:3px;">⏱ '+tareas[pi].tiempo+'</div>':'')+
+              '<button onclick="openPrepDetail('+selDay+','+pi+')" style="display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:12px;font-weight:700;color:var(--gold);background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.25);border-radius:8px;padding:5px 12px;cursor:pointer;font-family:inherit;">📋 Ver paso a paso</button>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
     }
-    prepAlertHTML='<div style="background:rgba(212,168,67,.07);border:1px solid rgba(212,168,67,.25);border-radius:var(--r);padding:14px 16px;margin-bottom:16px">'+
-      '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'+
-        '<span style="font-size:16px">⚠️</span>'+
-        '<div>'+
-          '<div style="font-size:13px;font-weight:700;color:var(--gold)">Tareas de prep para hoy</div>'+
-          '<div style="font-size:11px;color:var(--muted);margin-top:1px">Hazlas esta noche para ahorrar tiempo esta semana</div>'+
+    prepAlertHTML=
+      '<div style="background:rgba(212,168,67,.07);border:1px solid rgba(212,168,67,.3);border-radius:var(--r);overflow:hidden;margin-bottom:16px;">'+
+        '<div style="padding:14px 16px 10px;display:flex;align-items:center;justify-content:space-between;">'+
+          '<div style="display:flex;align-items:center;gap:8px;">'+
+            '<span style="font-size:18px;">🔪</span>'+
+            '<div>'+
+              '<div style="font-size:14px;font-weight:700;color:var(--gold);">Prep de hoy</div>'+
+              '<div style="font-size:11px;color:var(--muted);margin-top:1px;">'+donePrepCount+' de '+tareas.length+' hechos</div>'+
+            '</div>'+
+          '</div>'+
+          '<div style="font-size:20px;font-weight:800;color:var(--sage);">'+pct2+'%</div>'+
         '</div>'+
-      '</div>'+
-      filas+
-      '<div style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(212,168,67,.2)">'+
-        '<button onclick="goTab(\'prep\',document.querySelectorAll(\'.tab\')[3])" style="font-size:12px;font-weight:700;color:var(--gold);background:none;border:none;cursor:pointer;padding:0;font-family:inherit">Ver prep completo → 🔪</button>'+
-      '</div>'+
-    '</div>';
+        '<div style="height:3px;background:var(--line);"><div style="height:100%;width:'+pct2+'%;background:var(--sage);transition:.3s;"></div></div>'+
+        '<div style="padding:4px 16px 14px;">'+filas+'</div>'+
+      '</div>';
   }
   document.getElementById('vhoy').innerHTML=nowHTML+alert1+alert0+prepAlertHTML+macros+'<div class="sec-head">Las comidas de hoy</div>'+meals;
 }
@@ -1305,16 +1442,27 @@ function clearShop(){shopCk={};localStorage.setItem('mesa_shop','{}');renderComp
 /* ═══════════════════════════════════════
    VIEW: PREP
 ═══════════════════════════════════════ */
+/* mapa de PREP_DAYS index -> dayIdx para buscar en PREP_HOY */
+var PREP_DAY_MAP=[0,1,3,4]; /* domingo=0, lunes=1, miercoles=3, jueves->viernes no hay en PREP_DAYS */
+
 function renderPrep(){
   var html='<div class="info-banner"><div class="ib-icon">🔪</div><div class="ib-body"><div class="ib-title">Prep del domingo</div><div class="ib-text">1 hora mientras las costillas están en el horno. El resto de la semana cocinas en 15 min.</div></div></div>';
   for(var pi=0;pi<PREP_DAYS.length;pi++){
     var pd=PREP_DAYS[pi];var items=pd.items;var done=0;
     for(var ii=0;ii<items.length;ii++){if(prepCk[pi+'_'+ii]) done++;}
     var pct=Math.round(done/items.length*100);
+    var dayIdx=PREP_DAY_MAP[pi];
     html+='<div class="prep-day"><div class="prep-day-hdr"><div><div class="prep-day-title">'+pd.day+'</div><div class="prep-day-meta">'+pd.meta+'</div></div><div class="prep-day-pct">'+pct+'%</div></div>';
     for(var ii=0;ii<items.length;ii++){
       var it=items[ii];var key=pi+'_'+ii;
-      html+='<div class="prep-item '+(prepCk[key]?'ck':'')+'" onclick="ckPrep('+pi+','+ii+')"><div class="prep-ico">'+it.ico+'</div><div class="prep-txt">'+it.txt+'</div><div class="prep-chk"><span class="prep-chk-mark">✓</span></div></div>';
+      /* busca si existe detalle en PREP_HOY para este item */
+      var hayDetalle=PREP_HOY[dayIdx]&&PREP_HOY[dayIdx][ii]&&PREP_HOY[dayIdx][ii].pasos&&PREP_HOY[dayIdx][ii].pasos.length>0;
+      var btnDetalle=hayDetalle?'<button onclick="event.stopPropagation();openPrepDetail('+dayIdx+','+ii+')" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:12px;font-weight:700;color:var(--gold);background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.25);border-radius:8px;padding:5px 11px;cursor:pointer;font-family:inherit;">📋 Ver en detalle</button>':'';
+      html+='<div class="prep-item '+(prepCk[key]?'ck':'')+'" onclick="ckPrep('+pi+','+ii+')">'+
+        '<div class="prep-ico">'+it.ico+'</div>'+
+        '<div class="prep-txt" style="flex:1;">'+it.txt+btnDetalle+'</div>'+
+        '<div class="prep-chk"><span class="prep-chk-mark">✓</span></div>'+
+        '</div>';
     }
     html+='</div>';
   }
